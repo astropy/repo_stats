@@ -77,7 +77,7 @@ def parse_parameters(*args):
     )
 
     if params["cache_dir"] is None:
-        params["cache_dir"] = f"{repo_stats_path}/../cache/{params['repo_name']}"
+        params["cache_dir"] = f"{repo_stats_path}/../cache"
     Path(params["cache_dir"]).mkdir(parents=True, exist_ok=True)
 
     if params["template_image"] is None:
