@@ -1,0 +1,290 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>repo_stats.citation_metrics &mdash; repo_stats 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            repo_stats
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../py_API.html"> API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../genindex.html"> Index</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/jeffjennings/repo_stats"> GitHub repo</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">repo_stats</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">repo_stats.citation_metrics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for repo_stats.citation_metrics</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlencode</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="kn">from</span> <span class="nn">repo_stats.utilities</span> <span class="kn">import</span> <span class="n">update_cache</span>
+
+
+<div class="viewcode-block" id="ADSCitations">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.citation_metrics.ADSCitations">[docs]</a>
+<span class="k">class</span> <span class="nc">ADSCitations</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class for getting, processing and aggregating citation data from the NASA ADS database for a given set of papers.</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        token : str</span>
+<span class="sd">            Authorization token for ADS queries</span>
+<span class="sd">        cache_dir : str, default=None</span>
+<span class="sd">            Path to directory that will be populated with caches of citation data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span> <span class="o">=</span> <span class="n">cache_dir</span>
+
+<div class="viewcode-block" id="ADSCitations.get_citations">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.citation_metrics.ADSCitations.get_citations">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_citations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bib</span><span class="p">,</span> <span class="n">metric</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get citation data for a paper with the identifier &#39;bib&#39; by quering the ADS API.</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        bib : str</span>
+<span class="sd">            Bibcode identifier of the paper being cited, e.g., &quot;2013A&amp;A...558A..33A&quot;</span>
+<span class="sd">        metric : str</span>
+<span class="sd">            Metrics to return for each citation to the paper, e.g. &quot;bibcode, pubdate, pub, author, title&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        all_cites : list of dict</span>
+<span class="sd">            For each citation to the paper &#39;bib&#39;, a dictionary of &#39;metric&#39; data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cache_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">bib</span><span class="si">}</span><span class="s2">.txt&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_file</span><span class="p">):</span>
+            <span class="nb">open</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">old_cites</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">old_cites</span><span class="p">)</span><span class="si">}</span><span class="s2"> citations found in ADS cache at </span><span class="si">{</span><span class="n">cache_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">old_cites</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">end</span><span class="p">,</span> <span class="n">start</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">end</span><span class="p">,</span> <span class="n">start</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">old_cites</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">old_cites</span><span class="p">)</span>
+
+        <span class="n">new_cites</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="n">end</span> <span class="o">&gt;</span> <span class="n">start</span><span class="p">:</span>
+            <span class="n">encoded_query</span> <span class="o">=</span> <span class="n">urlencode</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;citations(</span><span class="si">{</span><span class="n">bib</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;fl&quot;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
+                    <span class="s2">&quot;rows&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+                    <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="n">start</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;https://api.adsabs.harvard.edu/v1/search/query?</span><span class="si">{</span><span class="n">encoded_query</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">,</span>
+                    <span class="s2">&quot;Content-type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;response&quot;</span><span class="p">]</span>
+
+                <span class="n">new_cites</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;docs&quot;</span><span class="p">])</span>
+                <span class="n">end</span><span class="p">,</span> <span class="n">start</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;numFound&quot;</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;docs&quot;</span><span class="p">])</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Query failed -- return code </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">all_cites</span> <span class="o">=</span> <span class="n">update_cache</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="n">old_cites</span><span class="p">,</span> <span class="n">new_cites</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">all_cites</span></div>
+
+
+<div class="viewcode-block" id="ADSCitations.process_citations">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.citation_metrics.ADSCitations.process_citations">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_citations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">citations</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process (obtain statistics for) citation data in &#39;citations&#39;</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        citations : list of dict</span>
+<span class="sd">            Dictionary of data for each citation to the reference paper</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        stats : dict</span>
+<span class="sd">            Citation statistics:</span>
+<span class="sd">                - &#39;cite_all&#39;: total number of citations</span>
+<span class="sd">                - &#39;cite_year&#39;: citations in current year</span>
+<span class="sd">                - &#39;cite_month&#39;: citations in previous month</span>
+<span class="sd">                - &#39;cite_per_year&#39;: citations per year</span>
+<span class="sd">                - &#39;cite_bibcodes&#39;: bibcodes of all citations</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># [year, month] of each citation</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;pubdate&quot;</span><span class="p">][:</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">citations</span><span class="p">]</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">]</span>
+
+        <span class="n">time_utc</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+        <span class="n">cite_total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">citations</span><span class="p">)</span>
+        <span class="n">cite_this_year</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">time_utc</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+
+        <span class="n">last_month</span> <span class="o">=</span> <span class="n">time_utc</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">cite_last_month</span> <span class="o">=</span> <span class="n">dates</span><span class="o">.</span><span class="n">count</span><span class="p">([</span><span class="n">last_month</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">last_month</span><span class="o">.</span><span class="n">month</span><span class="p">])</span>
+
+        <span class="n">cite_year</span><span class="p">,</span> <span class="n">cite_per_year</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">],</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">cite_bibcodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;bibcode&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">citations</span><span class="p">]</span>
+
+        <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;cite_all&quot;</span><span class="p">:</span> <span class="n">cite_total</span><span class="p">,</span>
+            <span class="s2">&quot;cite_year&quot;</span><span class="p">:</span> <span class="n">cite_this_year</span><span class="p">,</span>
+            <span class="s2">&quot;cite_month&quot;</span><span class="p">:</span> <span class="n">cite_last_month</span><span class="p">,</span>
+            <span class="s2">&quot;cite_per_year&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">cite_year</span><span class="p">,</span> <span class="n">cite_per_year</span><span class="p">],</span>
+            <span class="s2">&quot;cite_bibcodes&quot;</span><span class="p">:</span> <span class="n">cite_bibcodes</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">stats</span></div>
+
+
+<div class="viewcode-block" id="ADSCitations.aggregate_citations">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.citation_metrics.ADSCitations.aggregate_citations">[docs]</a>
+    <span class="k">def</span> <span class="nf">aggregate_citations</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">bibcode</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;bibcode, pubdate, pub, author, title&quot;</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get, process and aggregate citation data in &#39;metric&#39; for all papers in &#39;bibcode&#39;</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        bibcode : str or list of str</span>
+<span class="sd">            Bibcode identifier(s) of the paper(s) being cited, e.g., &quot;2013A&amp;A...558A..33A&quot;</span>
+<span class="sd">        metric : str, default=&quot;bibcode, pubdate, pub, author, title&quot;</span>
+<span class="sd">            Metrics to return for each citation</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        all_stats : dict</span>
+<span class="sd">            Individual and aggregated citation statistics across all papers in &#39;bibcode&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_citations</span><span class="p">,</span> <span class="n">all_stats</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">bb</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bibcode</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Collecting and processing citations for paper </span><span class="si">{</span><span class="n">ii</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">bibcode</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">bb</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">citations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_citations</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">metric</span><span class="p">)</span>
+            <span class="n">all_citations</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">citations</span><span class="p">)</span>
+
+            <span class="n">stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_citations</span><span class="p">(</span><span class="n">citations</span><span class="p">)</span>
+            <span class="n">all_stats</span><span class="p">[</span><span class="n">bb</span><span class="p">]</span> <span class="o">=</span> <span class="n">stats</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Aggregating citations for all papers&quot;</span><span class="p">)</span>
+        <span class="c1"># remove duplicates of papers that cite multiple references in &#39;bibcode&#39;</span>
+        <span class="n">all_citations_unique</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">x</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_citations</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_citations</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+        <span class="p">]</span>
+        <span class="n">all_stats</span><span class="p">[</span><span class="s2">&quot;aggregate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_citations</span><span class="p">(</span><span class="n">all_citations_unique</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_citations_unique</span><span class="p">)</span><span class="si">}</span><span class="s2"> unique of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_citations</span><span class="p">)</span><span class="si">}</span><span class="s2"> total citations - returning only unique citations&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">all_stats</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Jeff Jennings.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

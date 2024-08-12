@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>example_module &mdash; py_template 0.0.1 documentation</title>
+  <title>repo_stats API &mdash; repo_stats 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
@@ -25,7 +25,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Getting started" href="getting_started.html" /> 
+    <link rel="prev" title="Documentation" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -37,7 +37,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            py_template
+            repo_stats
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -47,19 +47,61 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html"> Getting started guide</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#"> API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#py_template.example_module.SoftwareGroup"><code class="docutils literal notranslate"><span class="pre">SoftwareGroup</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#py_template.example_module.fibonacci"><code class="docutils literal notranslate"><span class="pre">fibonacci()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#citation-metrics">citation_metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#repo_stats.citation_metrics.ADSCitations"><code class="docutils literal notranslate"><span class="pre">ADSCitations</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#repo_stats.citation_metrics.ADSCitations.aggregate_citations"><code class="docutils literal notranslate"><span class="pre">ADSCitations.aggregate_citations()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#repo_stats.citation_metrics.ADSCitations.get_citations"><code class="docutils literal notranslate"><span class="pre">ADSCitations.get_citations()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#repo_stats.citation_metrics.ADSCitations.process_citations"><code class="docutils literal notranslate"><span class="pre">ADSCitations.process_citations()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#git-metrics">git_metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#repo_stats.git_metrics.GitMetrics"><code class="docutils literal notranslate"><span class="pre">GitMetrics</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#repo_stats.git_metrics.GitMetrics.get_age"><code class="docutils literal notranslate"><span class="pre">GitMetrics.get_age()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#repo_stats.git_metrics.GitMetrics.get_commits"><code class="docutils literal notranslate"><span class="pre">GitMetrics.get_commits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#repo_stats.git_metrics.GitMetrics.get_commits_via_git_log"><code class="docutils literal notranslate"><span class="pre">GitMetrics.get_commits_via_git_log()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#repo_stats.git_metrics.GitMetrics.get_issues_PRs"><code class="docutils literal notranslate"><span class="pre">GitMetrics.get_issues_PRs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#repo_stats.git_metrics.GitMetrics.parse_log_line"><code class="docutils literal notranslate"><span class="pre">GitMetrics.parse_log_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#repo_stats.git_metrics.GitMetrics.process_commits"><code class="docutils literal notranslate"><span class="pre">GitMetrics.process_commits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#repo_stats.git_metrics.GitMetrics.process_issues_PRs"><code class="docutils literal notranslate"><span class="pre">GitMetrics.process_issues_PRs()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#plot">plot</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#repo_stats.plot.author_time_plot"><code class="docutils literal notranslate"><span class="pre">author_time_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#repo_stats.plot.citation_plot"><code class="docutils literal notranslate"><span class="pre">citation_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#repo_stats.plot.open_issue_PR_plot"><code class="docutils literal notranslate"><span class="pre">open_issue_PR_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#repo_stats.plot.issue_PR_time_plot"><code class="docutils literal notranslate"><span class="pre">issue_PR_time_plot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#runner">runner</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#repo_stats.runner.parse_parameters"><code class="docutils literal notranslate"><span class="pre">parse_parameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#repo_stats.runner.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#user-stats">user_stats</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#repo_stats.user_stats.StatsImage"><code class="docutils literal notranslate"><span class="pre">StatsImage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#repo_stats.user_stats.StatsImage.draw_text"><code class="docutils literal notranslate"><span class="pre">StatsImage.draw_text()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#repo_stats.user_stats.StatsImage.update_image"><code class="docutils literal notranslate"><span class="pre">StatsImage.update_image()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#utilities">utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#repo_stats.utilities.fill_missed_months"><code class="docutils literal notranslate"><span class="pre">fill_missed_months()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#repo_stats.utilities.rolling_average"><code class="docutils literal notranslate"><span class="pre">rolling_average()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#repo_stats.utilities.update_cache"><code class="docutils literal notranslate"><span class="pre">update_cache()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="genindex.html"> Index</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://github.com/CCA-Software-Group/py_template"> GitHub repo</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/jeffjennings/repo_stats"> GitHub repo</a></li>
 </ul>
 
         </div>
@@ -68,7 +110,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">py_template</a>
+          <a href="index.html">repo_stats</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -76,7 +118,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">example_module</li>
+      <li class="breadcrumb-item active">repo_stats API</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/py_API.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -86,46 +128,509 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="example-module">
-<h1>example_module<a class="headerlink" href="#example-module" title="Link to this heading"></a></h1>
+  <section id="repo-stats-api">
+<h1>repo_stats API<a class="headerlink" href="#repo-stats-api" title="Link to this heading"></a></h1>
+<section id="citation-metrics">
+<h2>citation_metrics<a class="headerlink" href="#citation-metrics" title="Link to this heading"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="py_template.example_module.SoftwareGroup">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">py_template.example_module.</span></span><span class="sig-name descname"><span class="pre">SoftwareGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">people</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">purpose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_template/example_module.html#SoftwareGroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_template.example_module.SoftwareGroup" title="Link to this definition"></a></dt>
-<dd><p>Example class.</p>
+<dt class="sig sig-object py" id="repo_stats.citation_metrics.ADSCitations">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">repo_stats.citation_metrics.</span></span><span class="sig-name descname"><span class="pre">ADSCitations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/citation_metrics.html#ADSCitations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.citation_metrics.ADSCitations" title="Link to this definition"></a></dt>
+<dd><p>Class for getting, processing and aggregating citation data from the NASA ADS database for a given set of papers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>people</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Group members</p></li>
-<li><p><strong>purpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Group objectives</p></li>
+<li><p><strong>token</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Authorization token for ADS queries</p></li>
+<li><p><strong>cache_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>default=None</em>) – Path to directory that will be populated with caches of citation data</p></li>
 </ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="repo_stats.citation_metrics.ADSCitations.aggregate_citations">
+<span class="sig-name descname"><span class="pre">aggregate_citations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bibcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bibcode,</span> <span class="pre">pubdate,</span> <span class="pre">pub,</span> <span class="pre">author,</span> <span class="pre">title'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/citation_metrics.html#ADSCitations.aggregate_citations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.citation_metrics.ADSCitations.aggregate_citations" title="Link to this definition"></a></dt>
+<dd><p>Get, process and aggregate citation data in ‘metric’ for all papers in ‘bibcode’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bibcode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Bibcode identifier(s) of the paper(s) being cited, e.g., “2013A&amp;A…558A..33A”</p></li>
+<li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>default=&quot;bibcode</em><em>, </em><em>pubdate</em><em>, </em><em>pub</em><em>, </em><em>author</em><em>, </em><em>title&quot;</em>) – Metrics to return for each citation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>all_stats</strong> – Individual and aggregated citation statistics across all papers in ‘bibcode’</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="repo_stats.citation_metrics.ADSCitations.get_citations">
+<span class="sig-name descname"><span class="pre">get_citations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bib</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/citation_metrics.html#ADSCitations.get_citations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.citation_metrics.ADSCitations.get_citations" title="Link to this definition"></a></dt>
+<dd><p>Get citation data for a paper with the identifier ‘bib’ by quering the ADS API.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bib</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Bibcode identifier of the paper being cited, e.g., “2013A&amp;A…558A..33A”</p></li>
+<li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Metrics to return for each citation to the paper, e.g. “bibcode, pubdate, pub, author, title”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>all_cites</strong> – For each citation to the paper ‘bib’, a dictionary of ‘metric’ data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)">list</a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="repo_stats.citation_metrics.ADSCitations.process_citations">
+<span class="sig-name descname"><span class="pre">process_citations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">citations</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/citation_metrics.html#ADSCitations.process_citations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.citation_metrics.ADSCitations.process_citations" title="Link to this definition"></a></dt>
+<dd><p>Process (obtain statistics for) citation data in ‘citations’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>citations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – Dictionary of data for each citation to the reference paper</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p><strong>stats</strong> –</p>
+<dl class="simple">
+<dt>Citation statistics:</dt><dd><ul class="simple">
+<li><p>’cite_all’: total number of citations</p></li>
+<li><p>’cite_year’: citations in current year</p></li>
+<li><p>’cite_month’: citations in previous month</p></li>
+<li><p>’cite_per_year’: citations per year</p></li>
+<li><p>’cite_bibcodes’: bibcodes of all citations</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="git-metrics">
+<h2>git_metrics<a class="headerlink" href="#git-metrics" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="repo_stats.git_metrics.GitMetrics">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">repo_stats.git_metrics.</span></span><span class="sig-name descname"><span class="pre">GitMetrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo_owner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/git_metrics.html#GitMetrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.git_metrics.GitMetrics" title="Link to this definition"></a></dt>
+<dd><p>Class for getting and processing repository data (commit history, issues, pull requests, contributors) from GitHub for a given repository.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Authorization token for GitHub queries</p></li>
+<li><p><strong>repo_owner</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Owner (or organization) of repository on GitHub</p></li>
+<li><p><strong>repo_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Name of repository on GitHub</p></li>
+<li><p><strong>cache_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>default=None</em>) – Path to directory that will be populated with caches of git data</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="repo_stats.git_metrics.GitMetrics.get_age">
+<span class="sig-name descname"><span class="pre">get_age</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/git_metrics.html#GitMetrics.get_age"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.git_metrics.GitMetrics.get_age" title="Link to this definition"></a></dt>
+<dd><p>Get the ‘datetime’ age of a string ‘date’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>date</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Dates with assumed string format “2024-01-01…”</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>age</strong> – Age of the item (int if ‘days_since’ is True)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>‘datetime.timedelta’ instance or <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="repo_stats.git_metrics.GitMetrics.get_commits">
+<span class="sig-name descname"><span class="pre">get_commits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/git_metrics.html#GitMetrics.get_commits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.git_metrics.GitMetrics.get_commits" title="Link to this definition"></a></dt>
+<dd><p>Obtain the commit history for a repository with ‘git log’, and parse the output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>all_items</strong> – A dictionary entry for each commit in the history, including the identifiers below in ‘query’</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)">list</a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="repo_stats.git_metrics.GitMetrics.get_commits_via_git_log">
+<span class="sig-name descname"><span class="pre">get_commits_via_git_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repo_local_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/git_metrics.html#GitMetrics.get_commits_via_git_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.git_metrics.GitMetrics.get_commits_via_git_log" title="Link to this definition"></a></dt>
+<dd><p>Obtain the commit history for a repository with ‘git log’ and a local copy of the repository; and parse the output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>repo_local_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Path to local copy of repository</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>dates</strong> (<em>list of str</em>) – Date of each commit</p></li>
+<li><p><strong>authors</strong> (<em>list of str</em>) – Author of each commit</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="repo_stats.git_metrics.GitMetrics.get_issues_PRs">
+<span class="sig-name descname"><span class="pre">get_issues_PRs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/git_metrics.html#GitMetrics.get_issues_PRs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.git_metrics.GitMetrics.get_issues_PRs" title="Link to this definition"></a></dt>
+<dd><p>Obtain the issue or pull request history for a GitHub repository by querying the GraphQL API.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>item_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – One of [‘issues’, ‘pullRequests’] to obtain the corresponding history</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>all_items</strong> – A dictionary entry for each issue or pull request in the history, including the identifiers below in ‘query’</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)">list</a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="repo_stats.git_metrics.GitMetrics.parse_log_line">
+<span class="sig-name descname"><span class="pre">parse_log_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/git_metrics.html#GitMetrics.parse_log_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.git_metrics.GitMetrics.parse_log_line" title="Link to this definition"></a></dt>
+<dd><p>Break an individual ‘git log’ line ‘line’ into its component parts (commit hash, date, author).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>line</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Dates with assumed string format “2024-01-01…”</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>parsed</strong> – The commit’s hash, date, author</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)">list</a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="repo_stats.git_metrics.GitMetrics.process_commits">
+<span class="sig-name descname"><span class="pre">process_commits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">age_recent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/git_metrics.html#GitMetrics.process_commits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.git_metrics.GitMetrics.process_commits" title="Link to this definition"></a></dt>
+<dd><p>Process (obtain statistics for) git commit data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – A dictionary entry for each commit in the history (see <code class="xref py py-obj docutils literal notranslate"><span class="pre">Git_metrics.get_commits</span></code>)</p></li>
+<li><p><strong>age_recent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><em>default=90</em>) – Days before present used to categorize recent commit statistics</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p><strong>stats</strong> –</p>
+<dl class="simple">
+<dt>Commit statistics:</dt><dd><ul class="simple">
+<li><p>’age_recent_commit’: the input arg ‘age_recent’</p></li>
+<li><p>’unique_authors’: each commit author, their number of commits and index of first commit</p></li>
+<li><p>’new_authors’: list of authors with their first commit in ‘age_recent’</p></li>
+<li><p>’n_recent_authors’: number of authors with commits in ‘age_recent’</p></li>
+<li><p>’authors_per_month’: number of commit authors per month, over time</p></li>
+<li><p>’new_authors_per_month’: number of new commit authors per month, over time</p></li>
+<li><p>’multi_authors_per_month’: number of commit authors per month with &gt;1 commit that month, over time</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="repo_stats.git_metrics.GitMetrics.process_issues_PRs">
+<span class="sig-name descname"><span class="pre">process_issues_PRs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">age_recent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/git_metrics.html#GitMetrics.process_issues_PRs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.git_metrics.GitMetrics.process_issues_PRs" title="Link to this definition"></a></dt>
+<dd><p>Process (obtain statistics for) and aggregate issue and pull request data in ‘results’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – A dictionary entry for each issue or pull request in the history (see <code class="xref py py-obj docutils literal notranslate"><span class="pre">Git_metrics.get_issues_PRs</span></code>)</p></li>
+<li><p><strong>items</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Names for the dictionary entries in the return ‘issues_prs’</p></li>
+<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – GitHub labels (those added to an issue or pull request) to obtain additional statistics for</p></li>
+<li><p><strong>age_recent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><em>default=90</em>) – Days before present used to categorize recent issue and pull request statistics</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p><strong>issues_prs</strong> –</p>
+<dl class="simple">
+<dt>Statistics for issues and separately for pull requests:</dt><dd><ul class="simple">
+<li><p>’age_recent’: the input arg ‘age_recent’</p></li>
+<li><p>’recent_open’: number of items (issues or pull requests) opened in ‘age_recent’</p></li>
+<li><p>’recent_close’: number of items closed in ‘age_recent’</p></li>
+<li><p>’open_per_month’: number of items opened per month, over time</p></li>
+<li><p>’close_per_month’: number of items closed per month, over time</p></li>
+<li><p>’label_open’: the input arg ‘labels’ and the number of currently open items with each label</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)">list</a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="plot">
+<h2>plot<a class="headerlink" href="#plot" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="repo_stats.plot.author_time_plot">
+<span class="sig-prename descclassname"><span class="pre">repo_stats.plot.</span></span><span class="sig-name descname"><span class="pre">author_time_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo_owner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_avg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/plot.html#author_time_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.plot.author_time_plot" title="Link to this definition"></a></dt>
+<dd><p>Plot respository commit authors over time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>commit_stats</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – Dictionary including commit statistics. See <code class="xref py py-obj docutils literal notranslate"><span class="pre">git_metrics.Gits.process_commits()</span></code></p></li>
+<li><p><strong>repo_owner</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Owner of repository (for labels)</p></li>
+<li><p><strong>repo_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Name of repository (for labels and figure savename)</p></li>
+<li><p><strong>cache_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Name of directory in which to cache figure</p></li>
+<li><p><strong>window_avg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><em>default=7</em>) – Number of months for rolling average of commit data. Enforced to be odd.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>fig</strong> – The generated figure</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plt.figure</span></code> instance</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="py_template.example_module.fibonacci">
-<span class="sig-prename descclassname"><span class="pre">py_template.example_module.</span></span><span class="sig-name descname"><span class="pre">fibonacci</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/py_template/example_module.html#fibonacci"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#py_template.example_module.fibonacci" title="Link to this definition"></a></dt>
-<dd><p>Example function.</p>
+<dt class="sig sig-object py" id="repo_stats.plot.citation_plot">
+<span class="sig-prename descclassname"><span class="pre">repo_stats.plot.</span></span><span class="sig-name descname"><span class="pre">citation_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cite_stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/plot.html#citation_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.plot.citation_plot" title="Link to this definition"></a></dt>
+<dd><p>Plot citations to referenced papers over time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – Integer term up to which the sequence is calculated</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cite_stats</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – Dictionary including citation statistics. See <code class="xref py py-obj docutils literal notranslate"><span class="pre">citation_metrics.Cites.aggregate_citations()</span></code></p></li>
+<li><p><strong>repo_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Name of repository (for labels and figure savename)</p></li>
+<li><p><strong>cache_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Name of directory in which to cache figure</p></li>
+<li><p><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – Name of referenced papers (for plot legend)</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>fib_seq</strong> – The Fibonacci sequence up to term <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code></p>
+<dd class="field-even"><p><strong>fig</strong> – The generated figure</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)">int</a>]</p>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plt.figure</span></code> instance</p>
 </dd>
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="repo_stats.plot.open_issue_PR_plot">
+<span class="sig-prename descclassname"><span class="pre">repo_stats.plot.</span></span><span class="sig-name descname"><span class="pre">open_issue_PR_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">issue_pr_stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/plot.html#open_issue_PR_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.plot.open_issue_PR_plot" title="Link to this definition"></a></dt>
+<dd><p>Plot a bar chart of a repository’s currently open issues and pull requests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>issue_pr_stats</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – Statistics for issues and pull requests (see <code class="xref py py-obj docutils literal notranslate"><span class="pre">git_metrics.Gits.process_issues_PRs</span></code>)</p></li>
+<li><p><strong>repo_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Name of repository (for labels and figure savename)</p></li>
+<li><p><strong>cache_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Name of directory in which to cache figure</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>fig</strong> – The generated figure</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plt.figure</span></code> instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="repo_stats.plot.issue_PR_time_plot">
+<span class="sig-prename descclassname"><span class="pre">repo_stats.plot.</span></span><span class="sig-name descname"><span class="pre">issue_PR_time_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">issue_pr_stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo_owner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_avg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/plot.html#issue_PR_time_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.plot.issue_PR_time_plot" title="Link to this definition"></a></dt>
+<dd><p>Plot a repository’s number of issues and pull requests open and closed over time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>issue_pr_stats</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – Statistics for issues and pull requests (see <code class="xref py py-obj docutils literal notranslate"><span class="pre">git_metrics.Gits.process_issues_PRs</span></code>)</p></li>
+<li><p><strong>repo_owner</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Owner of repository (for labels)</p></li>
+<li><p><strong>repo_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Name of repository (for labels and figure savename)</p></li>
+<li><p><strong>cache_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Name of directory in which to cache figure</p></li>
+<li><p><strong>window_avg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><em>default=7</em>) – Number of months for rolling average of commit data. Enforced to be odd.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>fig</strong> – The generated figure</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plt.figure</span></code> instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="runner">
+<h2>runner<a class="headerlink" href="#runner" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="repo_stats.runner.parse_parameters">
+<span class="sig-prename descclassname"><span class="pre">repo_stats.runner.</span></span><span class="sig-name descname"><span class="pre">parse_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/runner.html#parse_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.runner.parse_parameters" title="Link to this definition"></a></dt>
+<dd><p>Read the repository and citation targets and the analysis parameters from a .json parameter file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Simulates the command line arguments</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>params</strong> – Parameters used by the analysis</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="repo_stats.runner.main">
+<span class="sig-prename descclassname"><span class="pre">repo_stats.runner.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/runner.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.runner.main" title="Link to this definition"></a></dt>
+<dd><p>Run the citation and repository statistics analysis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Simulates the command line arguments</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="user-stats">
+<h2>user_stats<a class="headerlink" href="#user-stats" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="repo_stats.user_stats.StatsImage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">repo_stats.user_stats.</span></span><span class="sig-name descname"><span class="pre">StatsImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dark'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/user_stats.html#StatsImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.user_stats.StatsImage" title="Link to this definition"></a></dt>
+<dd><p>Class for updating a template image (e.g. to be displayed in a GitHub README) with repository and citation statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>template_image</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Template image to be updated</p></li>
+<li><p><strong>font</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Font file (.tff) to be used</p></li>
+<li><p><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – One of [“dark”, “light”]. Background color of the image.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="repo_stats.user_stats.StatsImage.draw_text">
+<span class="sig-name descname"><span class="pre">draw_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/user_stats.html#StatsImage.draw_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.user_stats.StatsImage.draw_text" title="Link to this definition"></a></dt>
+<dd><p>Convenience wrapper for ‘PIL.ImageDraw.Draw’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coords</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><em>tuple</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – (x,y) coordinates of text location</p></li>
+<li><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Text to be drawn</p></li>
+<li><p><strong>fill</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>default=None</em>) – Text color</p></li>
+<li><p><strong>font</strong> (<em>'PIL.ImageFont' instance</em><em>, </em><em>default=None</em>) – Text font</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="repo_stats.user_stats.StatsImage.update_image">
+<span class="sig-name descname"><span class="pre">update_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/user_stats.html#StatsImage.update_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.user_stats.StatsImage.update_image" title="Link to this definition"></a></dt>
+<dd><p>Update the provided template image with text summarizing respository and citation statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stats</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – A dictionary entry for each issue or pull request in the history (see <code class="xref py py-obj docutils literal notranslate"><span class="pre">Git_metrics.get_issues_PRs</span></code>)</p></li>
+<li><p><strong>repo_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Name of repository on GitHub (for drawn text)</p></li>
+<li><p><strong>cache_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Name of directory in which to cache updated image</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>self.img</strong> – The provided template image updated with text</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>‘PIL.Image’ instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="utilities">
+<h2>utilities<a class="headerlink" href="#utilities" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="repo_stats.utilities.fill_missed_months">
+<span class="sig-prename descclassname"><span class="pre">repo_stats.utilities.</span></span><span class="sig-name descname"><span class="pre">fill_missed_months</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unique_output</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/utilities.html#fill_missed_months"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.utilities.fill_missed_months" title="Link to this definition"></a></dt>
+<dd><p>For an output of ‘np.unique(x, return_counts=True)’ where ‘x’ is a list of dates of the format ‘2024-01’, fill in months missing in this list and set their count to 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>unique_output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><em>tuple</em></a><em> of </em><em>array</em>) – Output of ‘np.unique’</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>unique_output</strong> – The input updated with inserted entries for missing months</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)">list</a> of array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="repo_stats.utilities.rolling_average">
+<span class="sig-prename descclassname"><span class="pre">repo_stats.utilities.</span></span><span class="sig-name descname"><span class="pre">rolling_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unaveraged</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/utilities.html#rolling_average"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.utilities.rolling_average" title="Link to this definition"></a></dt>
+<dd><p>Obtain a rolling average of ‘unaveraged’ data in a sliding window of index length ‘window’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>unaveraged</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a>) – Data to be averaged</p></li>
+<li><p><strong>window</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – Width (in indices) of sliding window. Enforced to be odd</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>roll_avg</strong> (<em>array</em>) – Averaged data</p></li>
+<li><p><strong>window</strong> (<em>int</em>) – The input ‘window’, potentially decreased by 1 to make odd</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="repo_stats.utilities.update_cache">
+<span class="sig-prename descclassname"><span class="pre">repo_stats.utilities.</span></span><span class="sig-name descname"><span class="pre">update_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_items</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/repo_stats/utilities.html#update_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#repo_stats.utilities.update_cache" title="Link to this definition"></a></dt>
+<dd><p>Update ‘cache_file’ with ‘new_items’ entries, one per line</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cache_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Path to existing ASCII cache file</p></li>
+<li><p><strong>old_items</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Existing and new cache entries</p></li>
+<li><p><strong>new_items</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Existing and new cache entries</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>all_items</strong> – Combined ‘old_items’ and ‘new_items’</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)">list</a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

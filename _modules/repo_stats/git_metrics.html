@@ -1,0 +1,738 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>repo_stats.git_metrics &mdash; repo_stats 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            repo_stats
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../py_API.html"> API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../genindex.html"> Index</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/jeffjennings/repo_stats"> GitHub repo</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">repo_stats</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">repo_stats.git_metrics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for repo_stats.git_metrics</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">ast</span>
+
+<span class="kn">from</span> <span class="nn">repo_stats.utilities</span> <span class="kn">import</span> <span class="n">fill_missed_months</span><span class="p">,</span> <span class="n">update_cache</span>
+
+
+<div class="viewcode-block" id="GitMetrics">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.git_metrics.GitMetrics">[docs]</a>
+<span class="k">class</span> <span class="nc">GitMetrics</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">repo_owner</span><span class="p">,</span> <span class="n">repo_name</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class for getting and processing repository data (commit history, issues, pull requests, contributors) from GitHub for a given repository.</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        token : str</span>
+<span class="sd">            Authorization token for GitHub queries</span>
+<span class="sd">        repo_owner : str</span>
+<span class="sd">            Owner (or organization) of repository on GitHub</span>
+<span class="sd">        repo_name : str</span>
+<span class="sd">            Name of repository on GitHub</span>
+<span class="sd">        cache_dir : str, default=None</span>
+<span class="sd">            Path to directory that will be populated with caches of git data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repo_owner</span> <span class="o">=</span> <span class="n">repo_owner</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repo_name</span> <span class="o">=</span> <span class="n">repo_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span> <span class="o">=</span> <span class="n">cache_dir</span>
+
+<div class="viewcode-block" id="GitMetrics.get_age">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.git_metrics.GitMetrics.get_age">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_age</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the &#39;datetime&#39; age of a string &#39;date&#39;</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        date : str</span>
+<span class="sd">            Dates with assumed string format &quot;2024-01-01...&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        age : &#39;datetime.timedelta&#39; instance or int</span>
+<span class="sd">            Age of the item (int if &#39;days_since&#39; is True)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+        <span class="n">date_utc</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+        <span class="n">age</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">date_utc</span>
+
+        <span class="k">return</span> <span class="n">age</span></div>
+
+
+<div class="viewcode-block" id="GitMetrics.parse_log_line">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.git_metrics.GitMetrics.parse_log_line">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_log_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Break an individual &#39;git log&#39; line &#39;line&#39; into its component parts (commit hash, date, author).</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        line : str</span>
+<span class="sd">            Dates with assumed string format &quot;2024-01-01...&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        parsed : list of str</span>
+<span class="sd">            The commit&#39;s hash, date, author</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+        <span class="n">parsed</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">parsed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">parsed</span></div>
+
+
+<div class="viewcode-block" id="GitMetrics.get_commits">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.git_metrics.GitMetrics.get_commits">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_commits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Obtain the commit history for a repository with &#39;git log&#39;, and parse the output.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        all_items : list of dict</span>
+<span class="sd">            A dictionary entry for each commit in the history, including the identifiers below in &#39;query&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Collecting git commit history&quot;</span><span class="p">)</span>
+
+        <span class="n">cache_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_name</span><span class="si">}</span><span class="s2">_commits.txt&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_file</span><span class="p">):</span>
+            <span class="nb">open</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">old_items</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">old_items</span><span class="p">)</span><span class="si">}</span><span class="s2"> commits found in cache at </span><span class="si">{</span><span class="n">cache_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">old_items</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="c1"># NOTE: &#39;after&#39; here differs from GitMetrics.get_issues_PRs, as does its type in &#39;query&#39; below (&#39;String&#39; vs. &#39;String!&#39;) - see https://github.com/orgs/community/discussions/24443</span>
+            <span class="n">after</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># convert string to dict and get relevant key</span>
+            <span class="n">after</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">old_items</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))[</span><span class="s2">&quot;endCursor&quot;</span><span class="p">]</span>
+
+        <span class="c1"># For query syntax, see https://docs.github.com/en/graphql/reference/objects#repository</span>
+        <span class="c1"># and https://docs.github.com/en/graphql/reference/objects#commit</span>
+        <span class="c1"># and https://docs.github.com/en/graphql/reference/objects#gitactor</span>
+        <span class="c1"># and https://docs.github.com/en/graphql/guides/using-pagination-in-the-graphql-api</span>
+        <span class="c1"># To quickly test a query, try https://docs.github.com/en/graphql/overview/explorer</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        query($owner: String!, $name: String!, $after: String) {</span>
+<span class="s2">            repository(name: $name, owner: $owner) {</span>
+<span class="s2">                ref(qualifiedName: &quot;main&quot;) {</span>
+<span class="s2">                    target {</span>
+<span class="s2">                        ... on Commit {                    </span>
+<span class="s2">                            history(first: 100, after: $after) {</span>
+<span class="s2">                                pageInfo {</span>
+<span class="s2">                                    hasNextPage</span>
+<span class="s2">                                    endCursor</span>
+<span class="s2">                                }</span>
+<span class="s2">                        </span>
+<span class="s2">                                edges {</span>
+<span class="s2">                                    node {</span>
+<span class="s2">                                        oid</span>
+<span class="s2">                                        authoredDate</span>
+<span class="s2">                                        author {</span>
+<span class="s2">                                            name</span>
+<span class="s2">                                            email</span>
+<span class="s2">                                            user {</span>
+<span class="s2">                                                databaseId</span>
+<span class="s2">                                            }</span>
+<span class="s2">                                        }</span>
+<span class="s2">                                    }</span>
+<span class="s2">                                }</span>
+<span class="s2">                            }</span>
+<span class="s2">                        }</span>
+<span class="s2">                    }</span>
+<span class="s2">                }</span>
+<span class="s2">            }</span>
+<span class="s2">        }                </span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;token </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+        <span class="c1"># with &#39;after&#39;, traverse through items (issues or PRs) from oldest to newest</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;owner&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_owner</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_name</span><span class="p">,</span>
+            <span class="s2">&quot;after&quot;</span><span class="p">:</span> <span class="n">after</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># must traverse through pages of items</span>
+        <span class="n">hasNextPage</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">new_items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">items_retrieved</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">hasNextPage</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                <span class="s2">&quot;https://api.github.com/graphql&quot;</span><span class="p">,</span>
+                <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span> <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="n">variables</span><span class="p">},</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Query syntax is likely wrong. Reponse to query: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">err</span>
+
+                <span class="n">items_retrieved</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;repository&quot;</span><span class="p">][</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;target&quot;</span><span class="p">][</span><span class="s2">&quot;history&quot;</span><span class="p">][</span><span class="s2">&quot;edges&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+
+                <span class="n">time_to_reset</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-RateLimit-Reset&quot;</span><span class="p">])</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                    <span class="n">tz</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%M:%S&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="nb">len</span><span class="p">(</span>
+                        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;repository&quot;</span><span class="p">][</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;target&quot;</span><span class="p">][</span><span class="s2">&quot;history&quot;</span><span class="p">][</span>
+                            <span class="s2">&quot;edges&quot;</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="o">&gt;</span> <span class="mi">0</span>
+                <span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">  Retrieved </span><span class="si">{</span><span class="n">items_retrieved</span><span class="si">}</span><span class="s2"> new commits (rate limit used: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;X-RateLimit-Used&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;X-RateLimit-Limit&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> - resets in </span><span class="si">{</span><span class="n">time_to_reset</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                        <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                        <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                    <span class="c1"># store ID of the chronologically newest commit on current page, used to later reference newest item in cache</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;repository&quot;</span><span class="p">][</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;target&quot;</span><span class="p">][</span><span class="s2">&quot;history&quot;</span><span class="p">][</span><span class="s2">&quot;edges&quot;</span><span class="p">][</span>
+                        <span class="o">-</span><span class="mi">1</span>
+                    <span class="p">][</span><span class="s2">&quot;endCursor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;repository&quot;</span><span class="p">][</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;target&quot;</span><span class="p">][</span>
+                        <span class="s2">&quot;history&quot;</span>
+                    <span class="p">][</span>
+                        <span class="s2">&quot;pageInfo&quot;</span>
+                    <span class="p">][</span>
+                        <span class="s2">&quot;endCursor&quot;</span>
+                    <span class="p">]</span>
+                    <span class="n">new_items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;repository&quot;</span><span class="p">][</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;target&quot;</span><span class="p">][</span><span class="s2">&quot;history&quot;</span><span class="p">][</span>
+                            <span class="s2">&quot;edges&quot;</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+
+                <span class="n">hasNextPage</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;repository&quot;</span><span class="p">][</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;target&quot;</span><span class="p">][</span><span class="s2">&quot;history&quot;</span><span class="p">][</span>
+                    <span class="s2">&quot;pageInfo&quot;</span>
+                <span class="p">][</span><span class="s2">&quot;hasNextPage&quot;</span><span class="p">]</span>
+
+                <span class="n">variables</span><span class="p">[</span><span class="s2">&quot;after&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;repository&quot;</span><span class="p">][</span><span class="s2">&quot;ref&quot;</span><span class="p">][</span><span class="s2">&quot;target&quot;</span><span class="p">][</span>
+                    <span class="s2">&quot;history&quot;</span>
+                <span class="p">][</span><span class="s2">&quot;pageInfo&quot;</span><span class="p">][</span><span class="s2">&quot;endCursor&quot;</span><span class="p">]</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Query failed -- return code </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># prevent last flush, without printing new line</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="n">all_items</span> <span class="o">=</span> <span class="n">update_cache</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="n">old_items</span><span class="p">,</span> <span class="n">new_items</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">all_items</span></div>
+
+
+<div class="viewcode-block" id="GitMetrics.get_commits_via_git_log">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.git_metrics.GitMetrics.get_commits_via_git_log">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_commits_via_git_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_local_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Obtain the commit history for a repository with &#39;git log&#39; and a local copy of the repository; and parse the output.</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        repo_local_path : str</span>
+<span class="sd">            Path to local copy of repository</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dates : list of str</span>
+<span class="sd">            Date of each commit</span>
+<span class="sd">        authors : list of str</span>
+<span class="sd">            Author of each commit</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Collecting git commit history&quot;</span><span class="p">)</span>
+
+        <span class="n">git_log</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;git -C </span><span class="si">{</span><span class="n">repo_local_path</span><span class="si">}</span><span class="s1"> log --use-mailmap --date=iso-local --format=&quot;%H&quot;,&quot;%as&quot;,&quot;%aN&quot;&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span>
+            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="c1"># preserve non-English letters in names</span>
+            <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">dates</span><span class="p">,</span> <span class="n">authors</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">git_log</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+            <span class="n">commit_hash</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">author</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_log_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">dates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
+            <span class="n">authors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">author</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;0 commits found for repository in git log. Check that &#39;repo_dir&#39; </span><span class="si">{</span><span class="n">repo_local_path</span><span class="si">}</span><span class="s2"> in the .json parameter file is correct.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dates</span><span class="p">,</span> <span class="n">authors</span></div>
+
+
+<div class="viewcode-block" id="GitMetrics.process_commits">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.git_metrics.GitMetrics.process_commits">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_commits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">age_recent</span><span class="o">=</span><span class="mi">90</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process (obtain statistics for) git commit data</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        results : list of dict</span>
+<span class="sd">            A dictionary entry for each commit in the history (see `Git_metrics.get_commits`)</span>
+<span class="sd">        age_recent : int, default=90</span>
+<span class="sd">            Days before present used to categorize recent commit statistics</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        stats : dict</span>
+<span class="sd">            Commit statistics:</span>
+<span class="sd">                - &#39;age_recent_commit&#39;: the input arg &#39;age_recent&#39;</span>
+<span class="sd">                - &#39;unique_authors&#39;: each commit author, their number of commits and index of first commit</span>
+<span class="sd">                - &#39;new_authors&#39;: list of authors with their first commit in &#39;age_recent&#39;</span>
+<span class="sd">                - &#39;n_recent_authors&#39;: number of authors with commits in &#39;age_recent&#39;</span>
+<span class="sd">                - &#39;authors_per_month&#39;: number of commit authors per month, over time</span>
+<span class="sd">                - &#39;new_authors_per_month&#39;: number of new commit authors per month, over time</span>
+<span class="sd">                - &#39;multi_authors_per_month&#39;: number of commit authors per month with &gt;1 commit that month, over time</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dates</span><span class="p">,</span> <span class="n">authors</span><span class="p">,</span> <span class="n">userIDs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="n">bots</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;dependabot[bot]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;github-actions&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;odidev&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pre-commit-ci[bot]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;unknown&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ii</span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">][</span><span class="s2">&quot;author&quot;</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bots</span><span class="p">:</span>
+                <span class="n">dates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ii</span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">][</span><span class="s2">&quot;authoredDate&quot;</span><span class="p">])</span>
+                <span class="n">authors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ii</span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">][</span><span class="s2">&quot;author&quot;</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+                <span class="c1"># some authors have None in &#39;user&#39; field</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">userIDs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ii</span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">][</span><span class="s2">&quot;author&quot;</span><span class="p">][</span><span class="s2">&quot;user&quot;</span><span class="p">][</span><span class="s2">&quot;databaseId&quot;</span><span class="p">])</span>
+                <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                    <span class="n">userIDs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ii</span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">][</span><span class="s2">&quot;author&quot;</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span><span class="si">}</span><span class="s2"> total commits&quot;</span><span class="p">)</span>
+
+        <span class="c1"># assuming we don&#39;t have a .mailmap file to connect unique authors to multiple versions of their name and/or emails,</span>
+        <span class="c1"># use their GitHub IDs (likely won&#39;t catch all variations)</span>
+        <span class="n">uniqueIDs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">userIDs</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># IDs that occur in commit history at least twice</span>
+        <span class="n">uniqueIDs_repeat</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">x</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">uniqueIDs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">uniqueIDs</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span>
+        <span class="p">]</span>
+        <span class="c1"># set author name for all instances of the ID repeat to their name at last (most recent) instance</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">uniqueIDs_repeat</span><span class="p">:</span>
+            <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">userIDs</span><span class="p">)</span> <span class="o">==</span> <span class="n">i</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">idxs</span><span class="p">:</span>
+                <span class="n">authors</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">authors</span><span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+        <span class="n">dates_strip_day</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">]</span>
+        <span class="n">zipped</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dates_strip_day</span><span class="p">,</span> <span class="n">authors</span><span class="p">))</span>
+
+        <span class="n">unique_month_author_pairs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">zipped</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># number of unique commit authors per month</span>
+        <span class="n">authors_per_month</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">unique_month_author_pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="c1"># possible that not every month has commits,</span>
+        <span class="c1"># so insert months without commits and 0 for their number of authors</span>
+        <span class="n">authors_per_month</span> <span class="o">=</span> <span class="n">fill_missed_months</span><span class="p">(</span><span class="n">authors_per_month</span><span class="p">)</span>
+
+        <span class="c1"># number of authors per month with &gt;1 commit that month</span>
+        <span class="n">multi_authors_per_month</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_month_author_pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">unique_month_author_pairs</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span>
+            <span class="p">],</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">multi_authors_per_month</span> <span class="o">=</span> <span class="n">fill_missed_months</span><span class="p">(</span><span class="n">multi_authors_per_month</span><span class="p">)</span>
+
+        <span class="c1"># &#39;*last*&#39; and &#39;*first*&#39; variables assume the git log is in reverse chronological order</span>
+        <span class="n">unique_authors_last_commit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
+            <span class="n">authors</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="n">unique_authors_first_commit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
+            <span class="n">authors</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="c1"># last and first commit dates per author</span>
+        <span class="n">date_last_commit</span> <span class="o">=</span> <span class="p">[</span><span class="n">dates</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">unique_authors_last_commit</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">date_first_commit</span> <span class="o">=</span> <span class="p">[</span><span class="n">dates</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">unique_authors_first_commit</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+        <span class="c1"># number of new authors per month</span>
+        <span class="n">new_authors_per_month</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">x</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">date_first_commit</span><span class="p">],</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="n">new_authors_per_month</span> <span class="o">=</span> <span class="n">fill_missed_months</span><span class="p">(</span><span class="n">new_authors_per_month</span><span class="p">)</span>
+
+        <span class="n">n_recent_authors</span><span class="p">,</span> <span class="n">new_authors</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_authors_last_commit</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">last_commit_age</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_age</span><span class="p">(</span><span class="n">date_last_commit</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">first_commit_age</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_age</span><span class="p">(</span><span class="n">date_first_commit</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">last_commit_age</span><span class="o">.</span><span class="n">days</span> <span class="o">&lt;=</span> <span class="n">age_recent</span><span class="p">:</span>
+                <span class="n">n_recent_authors</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="c1"># authors with their first commit(s) in this period</span>
+                <span class="k">if</span> <span class="n">first_commit_age</span><span class="o">.</span><span class="n">days</span> <span class="o">&lt;=</span> <span class="n">age_recent</span><span class="p">:</span>
+                    <span class="n">new_authors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">jj</span><span class="p">))</span>
+
+        <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;age_recent_commit&quot;</span><span class="p">:</span> <span class="n">age_recent</span><span class="p">,</span>
+            <span class="s2">&quot;unique_authors&quot;</span><span class="p">:</span> <span class="n">unique_authors_first_commit</span><span class="p">,</span>
+            <span class="s2">&quot;new_authors&quot;</span><span class="p">:</span> <span class="n">new_authors</span><span class="p">,</span>
+            <span class="s2">&quot;n_recent_authors&quot;</span><span class="p">:</span> <span class="n">n_recent_authors</span><span class="p">,</span>
+            <span class="s2">&quot;authors_per_month&quot;</span><span class="p">:</span> <span class="n">authors_per_month</span><span class="p">,</span>
+            <span class="s2">&quot;new_authors_per_month&quot;</span><span class="p">:</span> <span class="n">new_authors_per_month</span><span class="p">,</span>
+            <span class="s2">&quot;multi_authors_per_month&quot;</span><span class="p">:</span> <span class="n">multi_authors_per_month</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">stats</span></div>
+
+
+<div class="viewcode-block" id="GitMetrics.get_issues_PRs">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.git_metrics.GitMetrics.get_issues_PRs">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_issues_PRs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_type</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Obtain the issue or pull request history for a GitHub repository by querying the GraphQL API.</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        item_type : str</span>
+<span class="sd">            One of [&#39;issues&#39;, &#39;pullRequests&#39;] to obtain the corresponding history</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        all_items : list of dict</span>
+<span class="sd">            A dictionary entry for each issue or pull request in the history, including the identifiers below in &#39;query&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Collecting GitHub </span><span class="si">{</span><span class="n">item_type</span><span class="si">}</span><span class="s2"> history&quot;</span><span class="p">)</span>
+
+        <span class="n">supported_items</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;issues&quot;</span><span class="p">,</span> <span class="s2">&quot;pullRequests&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">item_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_items</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;item_type </span><span class="si">{</span><span class="n">item_type</span><span class="si">}</span><span class="s2"> invalid; must be one of </span><span class="si">{</span><span class="n">supported_items</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">cache_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">item_type</span><span class="si">}</span><span class="s2">.txt&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_file</span><span class="p">):</span>
+            <span class="nb">open</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">old_items</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">old_items</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">item_type</span><span class="si">}</span><span class="s2"> found in cache at </span><span class="si">{</span><span class="n">cache_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">old_items</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="n">after</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># convert string to dict and get relevant key</span>
+            <span class="n">after</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">old_items</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))[</span><span class="s2">&quot;endCursor&quot;</span><span class="p">]</span>
+
+        <span class="c1"># For query syntax, see https://docs.github.com/en/graphql/reference/objects#repository</span>
+        <span class="c1"># and https://docs.github.com/en/graphql/reference/objects#issue</span>
+        <span class="c1"># and https://docs.github.com/en/graphql/reference/objects#pullrequest</span>
+        <span class="c1"># and https://docs.github.com/en/graphql/guides/using-pagination-in-the-graphql-api</span>
+        <span class="c1"># To quickly test a query, try https://docs.github.com/en/graphql/overview/explorer</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        query($owner: String!, $name: String!, $after: String!) {</span>
+<span class="sd">            repository(owner: $owner, name: $name) {</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+            <span class="o">+</span> <span class="n">item_type</span>
+            <span class="o">+</span> <span class="s2">&quot;&quot;&quot;(first: 100, after: $after) {</span>
+<span class="s2">                    totalCount</span>
+
+<span class="s2">                    pageInfo {</span>
+<span class="s2">                        hasNextPage</span>
+<span class="s2">                        endCursor  </span>
+<span class="s2">                    }      </span>
+
+<span class="s2">                    edges {</span>
+<span class="s2">                        node {</span>
+<span class="s2">                            number</span>
+<span class="s2">                            state</span>
+<span class="s2">                            createdAt</span>
+<span class="s2">                            updatedAt</span>
+<span class="s2">                            closedAt</span>
+
+<span class="s2">                            labels(first: 25) {</span>
+<span class="s2">                                edges {</span>
+<span class="s2">                                    node {</span>
+<span class="s2">                                        name</span>
+<span class="s2">                                    }</span>
+<span class="s2">                                }</span>
+<span class="s2">                            }</span>
+<span class="s2">                        }</span>
+<span class="s2">                    }</span>
+<span class="s2">                }</span>
+<span class="s2">            }</span>
+<span class="s2">        }</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;token </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+        <span class="c1"># with &#39;after&#39;, traverse through items (issues or PRs) from oldest to newest</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;owner&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_owner</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_name</span><span class="p">,</span>
+            <span class="s2">&quot;after&quot;</span><span class="p">:</span> <span class="n">after</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># must traverse through pages of items</span>
+        <span class="n">hasNextPage</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">new_items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">items_retrieved</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">hasNextPage</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                <span class="s2">&quot;https://api.github.com/graphql&quot;</span><span class="p">,</span>
+                <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span> <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="n">variables</span><span class="p">},</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Query syntax is likely wrong. Reponse to query: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">err</span>
+
+                <span class="n">items_retrieved</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;repository&quot;</span><span class="p">][</span><span class="n">item_type</span><span class="p">][</span><span class="s2">&quot;edges&quot;</span><span class="p">])</span>
+                <span class="n">items_total</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;repository&quot;</span><span class="p">][</span><span class="n">item_type</span><span class="p">][</span><span class="s2">&quot;totalCount&quot;</span><span class="p">]</span>
+
+                <span class="n">time_to_reset</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-RateLimit-Reset&quot;</span><span class="p">])</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                    <span class="n">tz</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%M:%S&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;repository&quot;</span><span class="p">][</span><span class="n">item_type</span><span class="p">][</span><span class="s2">&quot;edges&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">  Retrieved </span><span class="si">{</span><span class="n">items_retrieved</span><span class="si">}</span><span class="s2"> new of </span><span class="si">{</span><span class="n">items_total</span><span class="si">}</span><span class="s2"> total </span><span class="si">{</span><span class="n">item_type</span><span class="si">}</span><span class="s2"> (rate limit used: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;X-RateLimit-Used&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;X-RateLimit-Limit&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> - resets in </span><span class="si">{</span><span class="n">time_to_reset</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                        <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                        <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                    <span class="c1"># store ID of the chronologically newest item (issue or PR) on current page, used to later reference newest item in cache</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;repository&quot;</span><span class="p">][</span><span class="n">item_type</span><span class="p">][</span><span class="s2">&quot;edges&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span>
+                        <span class="s2">&quot;endCursor&quot;</span>
+                    <span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;repository&quot;</span><span class="p">][</span><span class="n">item_type</span><span class="p">][</span><span class="s2">&quot;pageInfo&quot;</span><span class="p">][</span><span class="s2">&quot;endCursor&quot;</span><span class="p">]</span>
+                    <span class="n">new_items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;repository&quot;</span><span class="p">][</span><span class="n">item_type</span><span class="p">][</span><span class="s2">&quot;edges&quot;</span><span class="p">])</span>
+
+                <span class="n">hasNextPage</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;repository&quot;</span><span class="p">][</span><span class="n">item_type</span><span class="p">][</span><span class="s2">&quot;pageInfo&quot;</span><span class="p">][</span>
+                    <span class="s2">&quot;hasNextPage&quot;</span>
+                <span class="p">]</span>
+
+                <span class="n">variables</span><span class="p">[</span><span class="s2">&quot;after&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;repository&quot;</span><span class="p">][</span><span class="n">item_type</span><span class="p">][</span>
+                    <span class="s2">&quot;pageInfo&quot;</span>
+                <span class="p">][</span><span class="s2">&quot;endCursor&quot;</span><span class="p">]</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Query failed -- return code </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># prevent last flush, without printing new line</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="n">all_items</span> <span class="o">=</span> <span class="n">update_cache</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="n">old_items</span><span class="p">,</span> <span class="n">new_items</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">all_items</span></div>
+
+
+<div class="viewcode-block" id="GitMetrics.process_issues_PRs">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.git_metrics.GitMetrics.process_issues_PRs">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_issues_PRs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">age_recent</span><span class="o">=</span><span class="mi">90</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process (obtain statistics for) and aggregate issue and pull request data in &#39;results&#39;.</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        results : list of dict</span>
+<span class="sd">            A dictionary entry for each issue or pull request in the history (see `Git_metrics.get_issues_PRs`)</span>
+<span class="sd">        items : list of str</span>
+<span class="sd">            Names for the dictionary entries in the return &#39;issues_prs&#39;</span>
+<span class="sd">        labels : list of str</span>
+<span class="sd">            GitHub labels (those added to an issue or pull request) to obtain additional statistics for</span>
+<span class="sd">        age_recent : int, default=90</span>
+<span class="sd">            Days before present used to categorize recent issue and pull request statistics</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        issues_prs : list of dict</span>
+<span class="sd">            Statistics for issues and separately for pull requests:</span>
+<span class="sd">                - &#39;age_recent&#39;: the input arg &#39;age_recent&#39;</span>
+<span class="sd">                - &#39;recent_open&#39;: number of items (issues or pull requests) opened in &#39;age_recent&#39;</span>
+<span class="sd">                - &#39;recent_close&#39;: number of items closed in &#39;age_recent&#39;</span>
+<span class="sd">                - &#39;open_per_month&#39;: number of items opened per month, over time</span>
+<span class="sd">                - &#39;close_per_month&#39;: number of items closed per month, over time</span>
+<span class="sd">                - &#39;label_open&#39;: the input arg &#39;labels&#39; and the number of currently open items with each label</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">issues_prs</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">hh</span><span class="p">,</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+            <span class="n">recent_open</span><span class="p">,</span> <span class="n">recent_close</span><span class="p">,</span> <span class="n">date_open</span><span class="p">,</span> <span class="n">date_close</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[]</span>
+            <span class="n">label_open_items</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">))</span>
+
+            <span class="k">for</span> <span class="n">jj</span> <span class="ow">in</span> <span class="n">ii</span><span class="p">:</span>
+                <span class="c1"># store dates as year-month e.g. &#39;2024-01&#39;</span>
+                <span class="n">date_open</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">jj</span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">][</span><span class="s2">&quot;createdAt&quot;</span><span class="p">][:</span><span class="mi">7</span><span class="p">])</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">jj</span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">][</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;OPEN&quot;</span><span class="p">:</span>
+                    <span class="n">date_close</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">jj</span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">][</span><span class="s2">&quot;closedAt&quot;</span><span class="p">][:</span><span class="mi">7</span><span class="p">])</span>
+
+                <span class="c1"># store age as days before present</span>
+                <span class="n">created_age</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_age</span><span class="p">(</span><span class="n">jj</span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">][</span><span class="s2">&quot;createdAt&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">created_age</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">created_age</span> <span class="o">=</span> <span class="n">created_age</span><span class="o">.</span><span class="n">days</span>
+                    <span class="k">if</span> <span class="n">created_age</span> <span class="o">&lt;=</span> <span class="n">age_recent</span><span class="p">:</span>
+                        <span class="n">recent_open</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="n">closed_age</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_age</span><span class="p">(</span><span class="n">jj</span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">][</span><span class="s2">&quot;closedAt&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">closed_age</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">closed_age</span> <span class="o">=</span> <span class="n">closed_age</span><span class="o">.</span><span class="n">days</span>
+                    <span class="k">if</span> <span class="n">closed_age</span> <span class="o">&lt;=</span> <span class="n">age_recent</span><span class="p">:</span>
+                        <span class="n">recent_close</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="n">jj</span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">][</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;OPEN&quot;</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">kk</span> <span class="ow">in</span> <span class="n">jj</span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">][</span><span class="s2">&quot;labels&quot;</span><span class="p">][</span><span class="s2">&quot;edges&quot;</span><span class="p">]:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">label_open_items</span><span class="p">[</span><span class="n">labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">kk</span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">])]</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                            <span class="k">pass</span>
+
+            <span class="n">open_per_month</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">date_open</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">close_per_month</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">date_close</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># not every month has newly opened/closed issues/PRs,</span>
+            <span class="c1"># so insert missed months</span>
+            <span class="n">open_per_month</span> <span class="o">=</span> <span class="n">fill_missed_months</span><span class="p">(</span><span class="n">open_per_month</span><span class="p">)</span>
+            <span class="n">close_per_month</span> <span class="o">=</span> <span class="n">fill_missed_months</span><span class="p">(</span><span class="n">close_per_month</span><span class="p">)</span>
+
+            <span class="n">issues_prs</span><span class="p">[</span><span class="n">items</span><span class="p">[</span><span class="n">hh</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;age_recent&quot;</span><span class="p">:</span> <span class="n">age_recent</span><span class="p">,</span>
+                <span class="s2">&quot;recent_open&quot;</span><span class="p">:</span> <span class="n">recent_open</span><span class="p">,</span>
+                <span class="s2">&quot;recent_close&quot;</span><span class="p">:</span> <span class="n">recent_close</span><span class="p">,</span>
+                <span class="s2">&quot;open_per_month&quot;</span><span class="p">:</span> <span class="n">open_per_month</span><span class="p">,</span>
+                <span class="s2">&quot;close_per_month&quot;</span><span class="p">:</span> <span class="n">close_per_month</span><span class="p">,</span>
+                <span class="s2">&quot;label_open&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">label_open_items</span><span class="p">)),</span>
+            <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">issues_prs</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Jeff Jennings.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,417 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>repo_stats.plot &mdash; repo_stats 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            repo_stats
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../py_API.html"> API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../genindex.html"> Index</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/jeffjennings/repo_stats"> GitHub repo</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">repo_stats</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">repo_stats.plot</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for repo_stats.plot</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.lines</span> <span class="kn">import</span> <span class="n">Line2D</span>
+
+<span class="kn">from</span> <span class="nn">repo_stats.utilities</span> <span class="kn">import</span> <span class="n">rolling_average</span>
+
+<span class="n">ms</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="s2">&quot;^&quot;</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;o&quot;</span><span class="p">]</span>
+<span class="n">cs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;#ff8300&quot;</span><span class="p">,</span> <span class="s2">&quot;#23d361&quot;</span><span class="p">,</span> <span class="s2">&quot;#bf177a&quot;</span><span class="p">,</span> <span class="s2">&quot;#20c8ed&quot;</span><span class="p">]</span>
+
+<span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%B </span><span class="si">%d</span><span class="s2">, %Y&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="author_time_plot">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.plot.author_time_plot">[docs]</a>
+<span class="k">def</span> <span class="nf">author_time_plot</span><span class="p">(</span><span class="n">commit_stats</span><span class="p">,</span> <span class="n">repo_owner</span><span class="p">,</span> <span class="n">repo_name</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">,</span> <span class="n">window_avg</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot respository commit authors over time.</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+<span class="sd">    commit_stats : dict</span>
+<span class="sd">        Dictionary including commit statistics. See `git_metrics.Gits.process_commits()`</span>
+<span class="sd">    repo_owner : str</span>
+<span class="sd">        Owner of repository (for labels)</span>
+<span class="sd">    repo_name : str</span>
+<span class="sd">        Name of repository (for labels and figure savename)</span>
+<span class="sd">    cache_dir : str</span>
+<span class="sd">        Name of directory in which to cache figure</span>
+<span class="sd">    window_avg : int, default=7</span>
+<span class="sd">        Number of months for rolling average of commit data. Enforced to be odd.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : `plt.figure` instance</span>
+<span class="sd">        The generated figure</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Making figure: commit authors over time&quot;</span><span class="p">)</span>
+
+    <span class="n">months</span><span class="p">,</span> <span class="n">authors</span> <span class="o">=</span> <span class="n">commit_stats</span><span class="p">[</span><span class="s2">&quot;authors_per_month&quot;</span><span class="p">]</span>
+    <span class="n">months_multi_authors</span><span class="p">,</span> <span class="n">multi_authors</span> <span class="o">=</span> <span class="n">commit_stats</span><span class="p">[</span><span class="s2">&quot;multi_authors_per_month&quot;</span><span class="p">]</span>
+    <span class="n">months_new_authors</span><span class="p">,</span> <span class="n">new_authors</span> <span class="o">=</span> <span class="n">commit_stats</span><span class="p">[</span><span class="s2">&quot;new_authors_per_month&quot;</span><span class="p">]</span>
+
+    <span class="c1"># don&#39;t include current month (if it&#39;s early in the month, result biased low)</span>
+    <span class="n">months</span> <span class="o">=</span> <span class="n">months</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">authors</span> <span class="o">=</span> <span class="n">authors</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">months_multi_authors</span> <span class="o">=</span> <span class="n">months_multi_authors</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">multi_authors</span> <span class="o">=</span> <span class="n">multi_authors</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">months_new_authors</span> <span class="o">=</span> <span class="n">months_new_authors</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">new_authors</span> <span class="o">=</span> <span class="n">new_authors</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">roll_avg</span><span class="p">,</span> <span class="n">window_avg</span> <span class="o">=</span> <span class="n">rolling_average</span><span class="p">(</span><span class="n">authors</span><span class="p">,</span> <span class="n">window_avg</span><span class="p">)</span>
+    <span class="n">roll_avg_multi</span><span class="p">,</span> <span class="n">window_avg</span> <span class="o">=</span> <span class="n">rolling_average</span><span class="p">(</span><span class="n">multi_authors</span><span class="p">,</span> <span class="n">window_avg</span><span class="p">)</span>
+    <span class="n">cut_idx</span> <span class="o">=</span> <span class="n">window_avg</span> <span class="o">//</span> <span class="mi">2</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">months</span><span class="p">,</span> <span class="n">authors</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Authors / month&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">months</span><span class="p">[</span><span class="n">cut_idx</span><span class="p">:</span><span class="o">-</span><span class="n">cut_idx</span><span class="p">],</span>
+        <span class="n">roll_avg</span><span class="p">,</span>
+        <span class="s2">&quot;k&quot;</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Authors / month: </span><span class="si">{</span><span class="n">window_avg</span><span class="si">}</span><span class="s2"> month rolling average&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">months_multi_authors</span><span class="p">,</span>
+        <span class="n">multi_authors</span><span class="p">,</span>
+        <span class="s2">&quot;r&quot;</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Authors with &gt;1 commit / month&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">months</span><span class="p">[</span><span class="n">cut_idx</span><span class="p">:</span><span class="o">-</span><span class="n">cut_idx</span><span class="p">],</span>
+        <span class="n">roll_avg_multi</span><span class="p">,</span>
+        <span class="s2">&quot;r&quot;</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Authors with &gt;1 commit / month: </span><span class="si">{</span><span class="n">window_avg</span><span class="si">}</span><span class="s2"> month rolling average&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">months_new_authors</span><span class="p">,</span> <span class="n">new_authors</span><span class="p">,</span> <span class="n">cs</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;New authors / month&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">months</span><span class="p">[::</span><span class="mi">12</span><span class="p">],</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Unique authors of commits to </span><span class="si">{</span><span class="n">repo_owner</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">repo_name</span><span class="si">}</span><span class="s2"> (generated on </span><span class="si">{</span><span class="n">now</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Date&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;N&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cache_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">repo_name</span><span class="si">}</span><span class="s2">_authors.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+    <span class="c1"># plt.show(block=False)</span>
+
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+
+<div class="viewcode-block" id="citation_plot">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.plot.citation_plot">[docs]</a>
+<span class="k">def</span> <span class="nf">citation_plot</span><span class="p">(</span><span class="n">cite_stats</span><span class="p">,</span> <span class="n">repo_name</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot citations to referenced papers over time.</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+<span class="sd">    cite_stats : dict</span>
+<span class="sd">        Dictionary including citation statistics. See `citation_metrics.Cites.aggregate_citations()`</span>
+<span class="sd">    repo_name : str</span>
+<span class="sd">        Name of repository (for labels and figure savename)</span>
+<span class="sd">    cache_dir : str</span>
+<span class="sd">        Name of directory in which to cache figure</span>
+<span class="sd">    names : list of str, optional</span>
+<span class="sd">        Name of referenced papers (for plot legend)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : `plt.figure` instance</span>
+<span class="sd">        The generated figure</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Making figure: citations over time&quot;</span><span class="p">)</span>
+
+    <span class="n">days_passed</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">month</span> <span class="o">*</span> <span class="mf">30.437</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">day</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">xx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cite_stats</span><span class="p">):</span>
+        <span class="n">cites</span> <span class="o">=</span> <span class="n">cite_stats</span><span class="p">[</span><span class="n">xx</span><span class="p">][</span><span class="s2">&quot;cite_per_year&quot;</span><span class="p">]</span>
+
+        <span class="c1"># remove one citation that has wrong year in ADS database</span>
+        <span class="k">if</span> <span class="n">names</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Astropy paper II (2018)&quot;</span><span class="p">:</span>
+            <span class="n">cites</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cites</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">cites</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:],</span> <span class="n">cites</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+
+        <span class="p">(</span><span class="n">line</span><span class="p">,)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">cites</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">cites</span><span class="p">[</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">marker</span><span class="o">=</span><span class="n">ms</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">cs</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">line</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">names</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="si">}</span><span class="s2">, N = </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">cites</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">names</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;All unique citations&quot;</span><span class="p">:</span>
+            <span class="n">line</span><span class="o">.</span><span class="n">set_linestyle</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">cites</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">cites</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">marker</span><span class="o">=</span><span class="n">ms</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">cs</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">cites</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">cites</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">365</span> <span class="o">/</span> <span class="n">days_passed</span><span class="p">),</span>
+            <span class="n">marker</span><span class="o">=</span><span class="n">ms</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">mec</span><span class="o">=</span><span class="n">cs</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span>
+            <span class="n">mfc</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">handles</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()</span>
+    <span class="n">point0</span> <span class="o">=</span> <span class="n">Line2D</span><span class="p">(</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="n">ms</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Year-to-date&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#a4a4a4&quot;</span>
+    <span class="p">)</span>
+    <span class="n">point1</span> <span class="o">=</span> <span class="n">Line2D</span><span class="p">(</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">marker</span><span class="o">=</span><span class="n">ms</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Projected (using year-to-date)&quot;</span><span class="p">,</span>
+        <span class="n">markeredgecolor</span><span class="o">=</span><span class="s2">&quot;#a4a4a4&quot;</span><span class="p">,</span>
+        <span class="n">markerfacecolor</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">handles</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">point0</span><span class="p">,</span> <span class="n">point1</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="n">handles</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Refereed citations to </span><span class="si">{</span><span class="n">repo_name</span><span class="si">}</span><span class="s2"> (via ADS) (generated on </span><span class="si">{</span><span class="n">now</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Year&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;N&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cache_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">repo_name</span><span class="si">}</span><span class="s2">_citations.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+    <span class="c1"># plt.show(block=False)</span>
+
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+
+<div class="viewcode-block" id="open_issue_PR_plot">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.plot.open_issue_PR_plot">[docs]</a>
+<span class="k">def</span> <span class="nf">open_issue_PR_plot</span><span class="p">(</span><span class="n">issue_pr_stats</span><span class="p">,</span> <span class="n">repo_name</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot a bar chart of a repository&#39;s currently open issues and pull requests.</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+<span class="sd">    issue_pr_stats : list of dict</span>
+<span class="sd">        Statistics for issues and pull requests (see `git_metrics.Gits.process_issues_PRs`)</span>
+<span class="sd">    repo_name : str</span>
+<span class="sd">        Name of repository (for labels and figure savename)</span>
+<span class="sd">    cache_dir : str</span>
+<span class="sd">        Name of directory in which to cache figure</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : `plt.figure` instance</span>
+<span class="sd">        The generated figure</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Making figure: currently open issues and pull requests&quot;</span><span class="p">)</span>
+
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">issue_pr_stats</span><span class="p">[</span><span class="s2">&quot;issues&quot;</span><span class="p">][</span><span class="s2">&quot;label_open&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="n">open_issues</span> <span class="o">=</span> <span class="n">issue_pr_stats</span><span class="p">[</span><span class="s2">&quot;issues&quot;</span><span class="p">][</span><span class="s2">&quot;label_open&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="n">open_prs</span> <span class="o">=</span> <span class="n">issue_pr_stats</span><span class="p">[</span><span class="s2">&quot;pullRequests&quot;</span><span class="p">][</span><span class="s2">&quot;label_open&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">open_issues</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cs</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Open issues&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">open_prs</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Open PRs&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Open issues and PRs per </span><span class="si">{</span><span class="n">repo_name</span><span class="si">}</span><span class="s2"> subpackage (generated on </span><span class="si">{</span><span class="n">now</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Subpackage&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;N&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cache_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">repo_name</span><span class="si">}</span><span class="s2">_open_items.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+    <span class="c1"># plt.show(block=False)</span>
+
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+
+
+<div class="viewcode-block" id="issue_PR_time_plot">
+<a class="viewcode-back" href="../../py_API.html#repo_stats.plot.issue_PR_time_plot">[docs]</a>
+<span class="k">def</span> <span class="nf">issue_PR_time_plot</span><span class="p">(</span><span class="n">issue_pr_stats</span><span class="p">,</span> <span class="n">repo_owner</span><span class="p">,</span> <span class="n">repo_name</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">,</span> <span class="n">window_avg</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot a repository&#39;s number of issues and pull requests open and closed over time.</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+<span class="sd">    issue_pr_stats : list of dict</span>
+<span class="sd">        Statistics for issues and pull requests (see `git_metrics.Gits.process_issues_PRs`)</span>
+<span class="sd">    repo_owner : str</span>
+<span class="sd">        Owner of repository (for labels)</span>
+<span class="sd">    repo_name : str</span>
+<span class="sd">        Name of repository (for labels and figure savename)</span>
+<span class="sd">    cache_dir : str</span>
+<span class="sd">        Name of directory in which to cache figure</span>
+<span class="sd">    window_avg : int, default=7</span>
+<span class="sd">        Number of months for rolling average of commit data. Enforced to be odd.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : `plt.figure` instance</span>
+<span class="sd">        The generated figure</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Making figure: issues and pull requests over time&quot;</span><span class="p">)</span>
+
+    <span class="n">month_io</span><span class="p">,</span> <span class="n">issue_open</span> <span class="o">=</span> <span class="n">issue_pr_stats</span><span class="p">[</span><span class="s2">&quot;issues&quot;</span><span class="p">][</span><span class="s2">&quot;open_per_month&quot;</span><span class="p">]</span>
+    <span class="n">month_ic</span><span class="p">,</span> <span class="n">issue_close</span> <span class="o">=</span> <span class="n">issue_pr_stats</span><span class="p">[</span><span class="s2">&quot;issues&quot;</span><span class="p">][</span><span class="s2">&quot;close_per_month&quot;</span><span class="p">]</span>
+    <span class="n">month_po</span><span class="p">,</span> <span class="n">pr_open</span> <span class="o">=</span> <span class="n">issue_pr_stats</span><span class="p">[</span><span class="s2">&quot;pullRequests&quot;</span><span class="p">][</span><span class="s2">&quot;open_per_month&quot;</span><span class="p">]</span>
+    <span class="n">month_pc</span><span class="p">,</span> <span class="n">pr_close</span> <span class="o">=</span> <span class="n">issue_pr_stats</span><span class="p">[</span><span class="s2">&quot;pullRequests&quot;</span><span class="p">][</span><span class="s2">&quot;close_per_month&quot;</span><span class="p">]</span>
+
+    <span class="c1"># don&#39;t include current month (if it&#39;s early in the month, result biased low)</span>
+    <span class="n">months</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">month_po</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">month_pc</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">month_io</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">month_ic</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+    <span class="p">]</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">pr_open</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">pr_close</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">issue_open</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">issue_close</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+    <span class="p">]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;PRs opened / month&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;PRs closed / month&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Issues opened / month&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Issues closed / month&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">events</span><span class="p">):</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">months</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">j</span><span class="p">,</span> <span class="n">cs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="n">roll_avg</span><span class="p">,</span> <span class="n">window_avg</span> <span class="o">=</span> <span class="n">rolling_average</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">window_avg</span><span class="p">)</span>
+        <span class="n">cut_idx</span> <span class="o">=</span> <span class="n">window_avg</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">months</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">cut_idx</span><span class="p">:</span><span class="o">-</span><span class="n">cut_idx</span><span class="p">],</span>
+            <span class="n">roll_avg</span><span class="p">,</span>
+            <span class="n">cs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">window_avg</span><span class="si">}</span><span class="s2"> month rolling average&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">months</span><span class="p">[</span><span class="n">i</span><span class="p">][::</span><span class="mi">12</span><span class="p">],</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Issues and PRs opened and closed in </span><span class="si">{</span><span class="n">repo_owner</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">repo_name</span><span class="si">}</span><span class="s2"> (generated on </span><span class="si">{</span><span class="n">now</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">ncol</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Date&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;N&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cache_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">repo_name</span><span class="si">}</span><span class="s2">_issues_PRs.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+    <span class="c1"># plt.show(block=False)</span>
+
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Jeff Jennings.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
