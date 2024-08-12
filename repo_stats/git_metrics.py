@@ -385,3 +385,146 @@ class GitMetrics:
 
         return stats
 
+    def get_issues_PRs(self, item_type):
+        """
+        Obtain the issue or pull request history for a GitHub repository by querying the GraphQL API.
+
+        Arguments
+        ---------
+        item_type : str
+            One of ['issues', 'pullRequests'] to obtain the corresponding history
+
+        Returns
+        -------
+        all_items : list of dict
+            A dictionary entry for each issue or pull request in the history, including the identifiers below in 'query'
+        """
+        print(f"\nCollecting GitHub {item_type} history")
+
+        supported_items = ["issues", "pullRequests"]
+        if item_type not in supported_items:
+            raise ValueError(
+                f"item_type {item_type} invalid; must be one of {supported_items}"
+            )
+
+        cache_file = f"{self.cache_dir}/{self.repo_name}_{item_type}.txt"
+        if not os.path.exists(cache_file):
+            open(cache_file, "w").close()
+
+        with open(cache_file, "r") as f:
+            old_items = f.readlines()
+            print(f"  {len(old_items)} {item_type} found in cache at {cache_file}")
+        if old_items == []:
+            after = ""
+        else:
+            # convert string to dict and get relevant key
+            after = ast.literal_eval(old_items[-1].rstrip("\n"))["endCursor"]
+
+        # For query syntax, see https://docs.github.com/en/graphql/reference/objects#repository
+        # and https://docs.github.com/en/graphql/reference/objects#issue
+        # and https://docs.github.com/en/graphql/reference/objects#pullrequest
+        # and https://docs.github.com/en/graphql/guides/using-pagination-in-the-graphql-api
+        # To quickly test a query, try https://docs.github.com/en/graphql/overview/explorer
+        query = (
+            """
+        query($owner: String!, $name: String!, $after: String!) {
+            repository(owner: $owner, name: $name) {
+                """
+            + item_type
+            + """(first: 100, after: $after) {
+                    totalCount
+
+                    pageInfo {
+                        hasNextPage
+                        endCursor  
+                    }      
+
+                    edges {
+                        node {
+                            number
+                            state
+                            createdAt
+                            updatedAt
+                            closedAt
+
+                            labels(first: 25) {
+                                edges {
+                                    node {
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        """
+        )
+
+        headers = {"Authorization": f"token {self.token}"}
+        # with 'after', traverse through items (issues or PRs) from oldest to newest
+        variables = {
+            "owner": self.repo_owner,
+            "name": self.repo_name,
+            "after": after,
+        }
+        # must traverse through pages of items
+        hasNextPage = True
+
+        new_items = []
+        items_retrieved = 0
+        while hasNextPage is True:
+            response = requests.post(
+                "https://api.github.com/graphql",
+                json={"query": query, "variables": variables},
+                headers=headers,
+            )
+
+            if response.status_code == 200:
+                result = response.json()
+                try:
+                    result["data"]
+                except KeyError as err:
+                    print(f"Query syntax is likely wrong. Reponse to query: {result}")
+                    raise err
+
+                items_retrieved += len(result["data"]["repository"][item_type]["edges"])
+                items_total = result["data"]["repository"][item_type]["totalCount"]
+
+                time_to_reset = datetime.fromtimestamp(
+                    int(response.headers["X-RateLimit-Reset"]) - time.time(),
+                    tz=timezone.utc,
+                ).strftime("%M:%S")
+
+                if len(result["data"]["repository"][item_type]["edges"]) > 0:
+                    print(
+                        f"\r  Retrieved {items_retrieved} new of {items_total} total {item_type} (rate limit used: {response.headers['X-RateLimit-Used']} of {response.headers['X-RateLimit-Limit']} - resets in {time_to_reset})",
+                        end="",
+                        flush=True,
+                    )
+
+                    # store ID of the chronologically newest item (issue or PR) on current page, used to later reference newest item in cache
+                    result["data"]["repository"][item_type]["edges"][-1][
+                        "endCursor"
+                    ] = result["data"]["repository"][item_type]["pageInfo"]["endCursor"]
+                    new_items.extend(result["data"]["repository"][item_type]["edges"])
+
+                hasNextPage = result["data"]["repository"][item_type]["pageInfo"][
+                    "hasNextPage"
+                ]
+
+                variables["after"] = result["data"]["repository"][item_type][
+                    "pageInfo"
+                ]["endCursor"]
+
+            else:
+                raise Exception(f"Query failed -- return code {response.status_code}")
+
+        # prevent last flush, without printing new line
+        print("", end="")
+
+        all_items = update_cache(cache_file, old_items, new_items)
+
+        return all_items
+
