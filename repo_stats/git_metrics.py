@@ -30,3 +30,27 @@ class GitMetrics:
         self.repo_name = repo_name
         self.cache_dir = cache_dir
 
+    def get_age(self, date):
+        """
+        Get the 'datetime' age of a string 'date'
+
+        Arguments
+        ---------
+        date : str
+            Dates with assumed string format "2024-01-01..."
+
+        Returns
+        -------
+        age : 'datetime.timedelta' instance or int
+            Age of the item (int if 'days_since' is True)
+
+        """
+        if date is None:
+            return -1
+
+        now = datetime.now(timezone.utc)
+        date_utc = datetime.strptime(date[:10], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        age = now - date_utc
+
+        return age
+
