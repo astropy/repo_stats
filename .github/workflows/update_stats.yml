@@ -1,9 +1,10 @@
 name: Update cache files
 
-on: push 
-# on:
-#   schedule:
-#     - cron: "20 21 * * *"
+# on: push 
+on:
+  schedule:
+    # workflow may be delayed for longer when it's on the hour
+    - cron: "20 07 * * *"
 
 jobs:
   build:
