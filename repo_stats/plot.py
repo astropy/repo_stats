@@ -94,3 +94,86 @@ def author_time_plot(commit_stats, repo_owner, repo_name, cache_dir, window_avg=
     return fig
 
 
+def citation_plot(cite_stats, repo_name, cache_dir, names=None):
+    """
+    Plot citations to referenced papers over time.
+
+    Arguments
+    ---------
+    cite_stats : dict
+        Dictionary including citation statistics. See `citation_metrics.Cites.aggregate_citations()`
+    repo_name : str
+        Name of repository (for labels and figure savename)
+    cache_dir : str
+        Name of directory in which to cache figure
+    names : list of str, optional
+        Name of referenced papers (for plot legend)
+
+    Returns
+    -------
+    fig : `plt.figure` instance
+        The generated figure
+    """
+    print("\nMaking figure: citations over time")
+
+    days_passed = datetime.today().month * 30.437 + datetime.today().day
+
+    fig = plt.figure(figsize=(10, 6))
+    for ii, xx in enumerate(cite_stats):
+        cites = cite_stats[xx]["cite_per_year"]
+
+        # remove one citation that has wrong year in ADS database
+        if names[ii] == "Astropy paper II (2018)":
+            cites[0], cites[1] = cites[0][1:], cites[1][1:]
+
+        (line,) = plt.plot(
+            cites[0][:-1],
+            cites[1][:-1],
+            marker=ms[ii],
+            c=cs[ii],
+        )
+        if names is not None:
+            line.set_label(f"{names[ii]}, N = {sum(cites[1])}")
+        if names[ii] == "All unique citations":
+            line.set_linestyle("--")
+
+        plt.plot(
+            cites[0][-1],
+            cites[1][-1],
+            marker=ms[-2],
+            c=cs[ii],
+        )
+        plt.plot(
+            cites[0][-1],
+            int(cites[1][-1] * 365 / days_passed),
+            marker=ms[-1],
+            mec=cs[ii],
+            mfc="none",
+        )
+
+    handles, _ = plt.gca().get_legend_handles_labels()
+    point0 = Line2D(
+        [0], [0], linestyle="", marker=ms[-2], label="Year-to-date", color="#a4a4a4"
+    )
+    point1 = Line2D(
+        [0],
+        [0],
+        linestyle="",
+        marker=ms[-1],
+        label="Projected (using year-to-date)",
+        markeredgecolor="#a4a4a4",
+        markerfacecolor="none",
+    )
+    handles.extend([point0, point1])
+    plt.legend(handles=handles)
+
+    plt.title(f"Refereed citations to {repo_name} (via ADS) (generated on {now})")
+    plt.xlabel("Year")
+    plt.ylabel("N")
+    plt.tight_layout()
+    plt.savefig(f"{cache_dir}/{repo_name}_citations.png", dpi=300)
+    # plt.show(block=False)
+
+    return fig
+
+
