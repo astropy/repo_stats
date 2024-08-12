@@ -127,3 +127,43 @@ class ADSCitations:
 
         return stats
 
+    def aggregate_citations(
+        self, bibcode, metric="bibcode, pubdate, pub, author, title"
+    ):
+        """
+        Get, process and aggregate citation data in 'metric' for all papers in 'bibcode'
+
+        Arguments
+        ---------
+        bibcode : str or list of str
+            Bibcode identifier(s) of the paper(s) being cited, e.g., "2013A&A...558A..33A"
+        metric : str, default="bibcode, pubdate, pub, author, title"
+            Metrics to return for each citation
+
+        Returns
+        -------
+        all_stats : dict
+            Individual and aggregated citation statistics across all papers in 'bibcode'
+        """
+        all_citations, all_stats = [], {}
+        for ii, bb in enumerate(bibcode):
+            print(
+                f"\nCollecting and processing citations for paper {ii + 1} of {len(bibcode)}: {bb}"
+            )
+            citations = self.get_citations(bb, metric)
+            all_citations.extend(citations)
+
+            stats = self.process_citations(citations)
+            all_stats[bb] = stats
+
+        print("\nAggregating citations for all papers")
+        # remove duplicates of papers that cite multiple references in 'bibcode'
+        all_citations_unique = [
+            x for i, x in enumerate(all_citations) if x not in all_citations[i + 1 :]
+        ]
+        all_stats["aggregate"] = self.process_citations(all_citations_unique)
+        print(
+            f"  {len(all_citations_unique)} unique of {len(all_citations)} total citations - returning only unique citations"
+        )
+
+        return all_stats
