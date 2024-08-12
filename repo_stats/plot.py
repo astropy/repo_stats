@@ -177,3 +177,44 @@ def citation_plot(cite_stats, repo_name, cache_dir, names=None):
     return fig
 
 
+def open_issue_PR_plot(issue_pr_stats, repo_name, cache_dir):
+    """
+    Plot a bar chart of a repository's currently open issues and pull requests.
+
+    Arguments
+    ---------
+    issue_pr_stats : list of dict
+        Statistics for issues and pull requests (see `git_metrics.Gits.process_issues_PRs`)
+    repo_name : str
+        Name of repository (for labels and figure savename)
+    cache_dir : str
+        Name of directory in which to cache figure
+
+    Returns
+    -------
+    fig : `plt.figure` instance
+        The generated figure
+    """
+    print("\nMaking figure: currently open issues and pull requests")
+
+    labels = issue_pr_stats["issues"]["label_open"].keys()
+    open_issues = issue_pr_stats["issues"]["label_open"].values()
+    open_prs = issue_pr_stats["pullRequests"]["label_open"].values()
+
+    fig = plt.figure(figsize=(10, 6))
+
+    plt.bar(labels, open_issues, color=cs[3], label="Open issues")
+    plt.bar(labels, open_prs, color="r", alpha=0.4, label="Open PRs")
+
+    plt.xticks(rotation=90)
+
+    plt.title(f"Open issues and PRs per {repo_name} subpackage (generated on {now})")
+    plt.legend()
+    plt.xlabel("Subpackage")
+    plt.ylabel("N")
+    plt.tight_layout()
+    plt.savefig(f"{cache_dir}/{repo_name}_open_items.png", dpi=300)
+    # plt.show(block=False)
+
+    return fig
+
