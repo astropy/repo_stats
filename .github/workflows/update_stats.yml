@@ -56,3 +56,16 @@ jobs:
         run: |
           echo ${{ hashFiles('./cache') }} >> ~/.cache_key
 
+      - name: Create and push to orphan branch 'cache' 
+        run: |          
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          git config --global user.name "github-actions-bot"
+          git config --global user.email "support+actions@github.com"
+          git checkout --orphan cache 
+          git rm -rf .
+          git add cache
+          git commit -m "update cache"
+          git push -f --set-upstream origin cache
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
