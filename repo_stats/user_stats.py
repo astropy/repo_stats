@@ -31,3 +31,25 @@ class StatsImage:
         else:
             self.fill = "#000000"
 
+    def draw_text(self, coords, text, fill=None, font=None, **kwargs):
+        """
+        Convenience wrapper for 'PIL.ImageDraw.Draw'
+
+        Arguments
+        ---------
+        coords : tuple of int
+            (x,y) coordinates of text location
+        text : str
+            Text to be drawn
+        fill : str, default=None
+            Text color
+        font : 'PIL.ImageFont' instance, default=None
+            Text font
+        """
+        if fill is None:
+            fill = self.fill
+        if font is None:
+            font = self.font_instance
+
+        self.draw.text(coords, str(text), fill=fill, font=font, **kwargs)
+
