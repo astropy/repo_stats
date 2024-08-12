@@ -90,3 +90,73 @@ def parse_parameters(*args):
 
     return params
 
+
+def main(*args):
+    """
+    Run the citation and repository statistics analysis.
+
+    Parameters
+    ----------
+    *args : list of str
+        Simulates the command line arguments
+    """
+    # load_dotenv()
+    # params['ads_token'] = os.getenv('ADS_TOKEN')
+    # params['git_token'] = os.getenv('GIT_TOKEN')
+    params = parse_parameters(*args)
+
+    Cites = ADSCitations(params["ads_token"], params["cache_dir"])
+    cite_stats = Cites.aggregate_citations(params["bibs"], params["ads_metrics"])
+
+    Gits = GitMetrics(
+        params["git_token"],
+        params["repo_owner"],
+        params["repo_name"],
+        params["cache_dir"],
+    )
+
+    commits = Gits.get_commits()
+    commit_stats = Gits.process_commits(commits, params["age_recent_commit"])
+
+    issues = Gits.get_issues_PRs("issues")
+    prs = Gits.get_issues_PRs("pullRequests")
+    issue_pr_stats = Gits.process_issues_PRs(
+        [issues, prs],
+        ["issues", "pullRequests"],
+        params["labels"],
+        params["age_recent_issue_pr"],
+    )
+
+    all_stats = {**cite_stats, **commit_stats, **issue_pr_stats}
+
+    print("\nUpdating dashboard image with stats")
+    background_colors = ["dark", "light"]
+    for ii, jj in enumerate(params["template_image"]):
+        UserStatsImage = StatsImage(jj, params["font"], color=background_colors[ii])
+        UserStatsImage.update_image(all_stats, params["repo_name"], params["cache_dir"])
+
+    citation_plot(
+        cite_stats, params["repo_name"], params["cache_dir"], params["bib_names"]
+    )
+
+    author_time_plot(
+        commit_stats,
+        params["repo_owner"],
+        params["repo_name"],
+        params["cache_dir"],
+        params["window_avg"],
+    )
+
+    open_issue_PR_plot(issue_pr_stats, params["repo_name"], params["cache_dir"])
+
+    issue_PR_time_plot(
+        issue_pr_stats,
+        params["repo_owner"],
+        params["repo_name"],
+        params["cache_dir"],
+        params["window_avg"],
+    )
+
+
+if __name__ == "__main__":
+    main()
