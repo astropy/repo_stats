@@ -68,3 +68,36 @@ def fill_missed_months(unique_output):
     return unique_output
 
 
+def update_cache(cache_file, old_items, new_items):
+    """
+    Update 'cache_file' with 'new_items' entries, one per line
+
+    Arguments
+    ---------
+    cache_file : str
+        Path to existing ASCII cache file
+    old_items, new_items : str or list of str
+        Existing and new cache entries
+
+    Returns
+    -------
+    all_items : list of str
+        Combined 'old_items' and 'new_items'
+    """
+    with open(cache_file, "a+") as f:
+        # add initial new line only when appending to existing entries in cache
+        if len(old_items) != 0 and new_items != []:
+            f.writelines("\n")
+
+        f.writelines("\n".join([str(i) for i in new_items]))
+
+        if new_items == []:
+            print(f"  No new entries found - cache not updated")
+        else:
+            print(f"\n  Updated cache at {cache_file} with {len(new_items)} entries")
+
+    with open(cache_file, "r") as f:
+        all_items = f.readlines()
+        all_items = [ast.literal_eval(i.rstrip("\n")) for i in all_items]
+
+    return all_items
