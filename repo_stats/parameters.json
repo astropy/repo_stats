@@ -1,0 +1,41 @@
+{
+    "repo_owner": "astropy",
+    "repo_name": "astropy",
+    "template_image": null,
+    "age_recent_commit": 90,
+    "age_recent_issue_pr": 90,
+    "window_avg": 7,
+    "labels": [
+        "constants",
+        "convolution",
+        "coordinates",
+        "cosmology",
+        "io.ascii",
+        "io.fits",
+        "io.misc",
+        "modeling",
+        "nddata",
+        "samp",
+        "stats",
+        "table",
+        "time",
+        "timeseries",
+        "uncertainty",
+        "units",
+        "utils",
+        "visualization",
+        "wcs"
+    ],
+    "bibs": [
+        "2013A&A...558A..33A",
+        "2018AJ....156..123A",
+        "2022ApJ...935..167A"
+    ],
+    "bib_names": [
+        "Astropy paper I (2013)",
+        "Astropy paper II (2018)",
+        "Astropy paper III (2022)",
+        "All unique citations"
+    ],
+    "ads_metrics": "bibcode, pubdate, pub, author, title"
+}
