@@ -222,3 +222,41 @@ class GitMetrics:
 
         return all_items
 
+    def get_commits_via_git_log(self, repo_local_path):
+        """
+        Obtain the commit history for a repository with 'git log' and a local copy of the repository; and parse the output.
+
+        Arguments
+        ---------
+        repo_local_path : str
+            Path to local copy of repository
+
+        Returns
+        -------
+        dates : list of str
+            Date of each commit
+        authors : list of str
+            Author of each commit
+        """
+        print("\nCollecting git commit history")
+
+        git_log = subprocess.run(
+            args=f'git -C {repo_local_path} log --use-mailmap --date=iso-local --format="%H","%as","%aN"'.split(),
+            stdout=subprocess.PIPE,
+            # preserve non-English letters in names
+            text=True,
+        )
+
+        dates, authors = [], []
+        for line in git_log.stdout.splitlines():
+            commit_hash, date, author = self.parse_log_line(line)
+            dates.append(date)
+            authors.append(author)
+
+        if len(dates) == 0:
+            raise RuntimeError(
+                f"0 commits found for repository in git log. Check that 'repo_dir' {repo_local_path} in the .json parameter file is correct."
+            )
+
+        return dates, authors
+
