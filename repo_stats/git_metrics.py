@@ -528,3 +528,78 @@ class GitMetrics:
 
         return all_items
 
+    def process_issues_PRs(self, results, items, labels, age_recent=90):
+        """
+        Process (obtain statistics for) and aggregate issue and pull request data in 'results'.
+
+        Arguments
+        ---------
+        results : list of dict
+            A dictionary entry for each issue or pull request in the history (see `Git_metrics.get_issues_PRs`)
+        items : list of str
+            Names for the dictionary entries in the return 'issues_prs'
+        labels : list of str
+            GitHub labels (those added to an issue or pull request) to obtain additional statistics for
+        age_recent : int, default=90
+            Days before present used to categorize recent issue and pull request statistics
+
+        Returns
+        -------
+        issues_prs : list of dict
+            Statistics for issues and separately for pull requests:
+                - 'age_recent': the input arg 'age_recent'
+                - 'recent_open': number of items (issues or pull requests) opened in 'age_recent'
+                - 'recent_close': number of items closed in 'age_recent'
+                - 'open_per_month': number of items opened per month, over time
+                - 'close_per_month': number of items closed per month, over time
+                - 'label_open': the input arg 'labels' and the number of currently open items with each label
+        """
+        issues_prs = {}
+
+        for hh, ii in enumerate(results):
+            recent_open, recent_close, date_open, date_close = 0, 0, [], []
+            label_open_items = np.zeros(len(labels))
+
+            for jj in ii:
+                # store dates as year-month e.g. '2024-01'
+                date_open.append(jj["node"]["createdAt"][:7])
+                if not jj["node"]["state"] == "OPEN":
+                    date_close.append(jj["node"]["closedAt"][:7])
+
+                # store age as days before present
+                created_age = self.get_age(jj["node"]["createdAt"])
+                if created_age != -1:
+                    created_age = created_age.days
+                    if created_age <= age_recent:
+                        recent_open += 1
+
+                closed_age = self.get_age(jj["node"]["closedAt"])
+                if closed_age != -1:
+                    closed_age = closed_age.days
+                    if closed_age <= age_recent:
+                        recent_close += 1
+
+                if jj["node"]["state"] == "OPEN":
+                    for kk in jj["node"]["labels"]["edges"]:
+                        try:
+                            label_open_items[labels.index(kk["node"]["name"])] += 1
+                        except ValueError:
+                            pass
+
+            open_per_month = np.unique(date_open, return_counts=True)
+            close_per_month = np.unique(date_close, return_counts=True)
+            # not every month has newly opened/closed issues/PRs,
+            # so insert missed months
+            open_per_month = fill_missed_months(open_per_month)
+            close_per_month = fill_missed_months(close_per_month)
+
+            issues_prs[items[hh]] = {
+                "age_recent": age_recent,
+                "recent_open": recent_open,
+                "recent_close": recent_close,
+                "open_per_month": open_per_month,
+                "close_per_month": close_per_month,
+                "label_open": dict(zip(labels, label_open_items)),
+            }
+
+        return issues_prs
