@@ -1,0 +1,30 @@
+name: Coding standards
+on: push
+
+jobs:
+  check_code_standards:
+    name: Format, lint code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+    
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+
+      - name: Install dependencies
+        run: | 
+          pip install setuptools --upgrade
+          pip install .[coding_standards]
+
+      - name: Install package
+        run: pip install .
+
+      - name: Run `ruff` linter / formatter
+        run: ruff check .

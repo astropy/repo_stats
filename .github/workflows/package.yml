@@ -1,0 +1,42 @@
+name: build and release to PyPI
+
+on:
+  release:
+    types:
+      - released
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install setuptools wheel twine
+          pip install pep517 --user
+
+      - name: Install package
+        run: |
+          pip install .
+
+      - name: Build binary wheel and source tarball
+        run: |
+          python -m pep517.build --source --binary --out-dir dist/ .
+
+      - name: Publish distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.pypi_password }}

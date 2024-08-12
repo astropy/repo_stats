@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "py_template"
+description = "Template Python repository"
+dynamic = ["version"]
+readme = { file = "README.rst", content-type = "text/x-rst" }
+license = { file = "LICENSE.rst", content-type = "text/plain" }
+authors = [
+  { name = "Jeff Jennings", email = "jjennings@flatironinstitute.org" },
+]
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "coverage",
+    "coverage-badge",
+]
+docs = [
+    "sphinx",
+    "sphinx-automodapi",
+    "sphinx_rtd_theme",
+    "sphinxcontrib-fulltoc",
+    "nbsphinx",
+    "jupyter_client",
+    "ipykernel",
+]
+coding_standards = [
+    "ruff",
+]
+type_checking = [
+    "mypy",
+]
+dev = ["py_template[test, docs, coding_standards]"]
+
+[tool.setuptools]
+zip-safe = false
+include-package-data = true
+
+[tool.setuptools.packages.find]
+
+[tool.pytest.ini_options]
+testpaths = [
+  "test",
+  "docs",
+]
+
+[tool.mypy]
+exclude = [
+  "docs",
+]
+explicit_package_bases = "True"
+
+[tool.coverage.run]
+omit = [
+ "py_template/__init*",
+ "*/py_template/__init*",
+ "test/*",
+ "*/test/*",
+]
