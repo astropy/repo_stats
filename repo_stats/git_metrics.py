@@ -54,3 +54,24 @@ class GitMetrics:
 
         return age
 
+    def parse_log_line(self, line):
+        """
+        Break an individual 'git log' line 'line' into its component parts (commit hash, date, author).
+
+        Arguments
+        ---------
+        line : str
+            Dates with assumed string format "2024-01-01..."
+
+        Returns
+        -------
+        parsed : list of str
+            The commit's hash, date, author
+        """
+        line = line.split(",")
+        parsed = []
+        for ii in range(3):
+            parsed.append(line[ii].lstrip('"').rstrip('"\n'))
+
+        return parsed
+
