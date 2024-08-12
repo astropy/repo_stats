@@ -1,0 +1,11 @@
+.wy-side-nav-search, .wy-nav-top {
+    background: #0CCF88;
+  }
+
+.wy-menu > .caption > span.caption-text {
+color: #0CCF88;
+}
+
+.nbinput .prompt, .nboutput .prompt {
+    display: none;
+}

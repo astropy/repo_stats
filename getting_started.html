@@ -1,0 +1,191 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting started &mdash; py_template 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="example_module" href="py_API.html" />
+    <link rel="prev" title="Documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            py_template
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#"> Getting started guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#repo-file-structure">Repo file structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#making-a-new-python-repo-using-py-template">Making a new Python repo using <code class="xref py py-obj docutils literal notranslate"><span class="pre">py_template</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interacting-with-your-new-code">Interacting with your new code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#developing-your-package">Developing your package</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="py_API.html"> API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html"> Index</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/CCA-Software-Group/py_template"> GitHub repo</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">py_template</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting started</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<h1>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
+<section id="repo-file-structure">
+<h2>Repo file structure<a class="headerlink" href="#repo-file-structure" title="Link to this heading"></a></h2>
+<div class="line-block">
+<div class="line">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">py_template</span></code> repo has a basic file structure:</div>
+<div class="line">1) <code class="xref py py-obj docutils literal notranslate"><span class="pre">github</span></code> has two subfolders:</div>
+<div class="line-block">
+<div class="line">* <code class="xref py py-obj docutils literal notranslate"><span class="pre">ISSUE_TEMPLATE</span></code> has files that are templates users can select from when opening an issue in the repo on GitHub</div>
+<div class="line">* <code class="xref py py-obj docutils literal notranslate"><span class="pre">workflows</span></code> implements continuous integration (CI) through GitHub ‘actions’ that are automatically run according to a chosen trigger. These are currently:</div>
+<div class="line-block">
+<div class="line">- <code class="xref py py-obj docutils literal notranslate"><span class="pre">docs.yml</span></code> builds and deploys this docs site when a push is made to <code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code>.</div>
+<div class="line">- <code class="xref py py-obj docutils literal notranslate"><span class="pre">format_lint.yml</span></code> lints and formats the code on each push using <em>ruff</em>.</div>
+<div class="line">- <code class="xref py py-obj docutils literal notranslate"><span class="pre">package.yml</span></code> releases the package to PyPI on each <em>release</em> (create a release from the repo’s main GitHub page). This makes the latest release version of the package <em>pip</em>-installable. For a guide on how to first reserve a name for your project on PyPI (necessary for this workflow), see the <a class="reference external" href="https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/">Python packaging guide</a>.</div>
+<div class="line">- <code class="xref py py-obj docutils literal notranslate"><span class="pre">tests.yml</span></code> runs tests with <em>pytest</em> on each push.</div>
+<div class="line">- <code class="xref py py-obj docutils literal notranslate"><span class="pre">type_check.yml</span></code> runs type checking with <em>mypy</em> on each push. The CI continues even if the type checker finds errors.</div>
+</div>
+</div>
+<div class="line">2) <code class="xref py py-obj docutils literal notranslate"><span class="pre">docs</span></code> has the files used to build the docs with <em>Sphinx</em>, with the site content in <code class="xref py py-obj docutils literal notranslate"><span class="pre">index.rst</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">py_API.rst</span></code>.</div>
+<div class="line">3) <code class="xref py py-obj docutils literal notranslate"><span class="pre">py_template</span></code> is the source code folder, with the necessary <code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__.py</span></code> and example code file, <code class="xref py py-obj docutils literal notranslate"><span class="pre">example_module.py</span></code>.</div>
+<div class="line">4) <a class="reference external" href="https://docs.python.org/3/library/test.html#module-test" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test</span></code></a> has the unit tests, with example tests for the source code file in <code class="xref py py-obj docutils literal notranslate"><span class="pre">test_example_module.py</span></code>. When you add new test files, they should start with <code class="xref py py-obj docutils literal notranslate"><span class="pre">test_</span></code> so <em>pytest</em> recognizes them.</div>
+<div class="line">5) <code class="xref py py-obj docutils literal notranslate"><span class="pre">gitignore</span></code> is a list of file types that are ignored when you push to the remote repo.</div>
+<div class="line">6) <code class="xref py py-obj docutils literal notranslate"><span class="pre">HISTORY.rst</span></code> is the change log that you should update as you implement the packaged version.</div>
+<div class="line">7) <code class="xref py py-obj docutils literal notranslate"><span class="pre">LICENSE.rst</span></code> has the package’s license.</div>
+<div class="line">8) <code class="xref py py-obj docutils literal notranslate"><span class="pre">MANIFEST.in</span></code> has instructions for how to pre-process the package (which files to exclude) when preparing to release it to PyPI (the Python Package Index). Packages uploaded to PyPI can be installed by users with <em>pip</em>.</div>
+<div class="line">9) <code class="xref py py-obj docutils literal notranslate"><span class="pre">README.md</span></code> is the file you’re reading! It has badges that use the CI to display if the unit tests are passing, what percentage of the code is covered by the tests, and if the docs build and deploy is passing.</div>
+<div class="line">10) <code class="xref py py-obj docutils literal notranslate"><span class="pre">pyproject.toml</span></code> is the configuration file for packaging the software. See the <a class="reference external" href="https://packaging.python.org/en/latest/guides/writing-pyproject-toml/">Python docs</a> for a description of its contents. See also the <code class="xref py py-obj docutils literal notranslate"><span class="pre">example_setup_files</span></code> directory for an example minimal <code class="xref py py-obj docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and the analogous <code class="xref py py-obj docutils literal notranslate"><span class="pre">setup.py</span></code>.</div>
+</div>
+</section>
+<section id="making-a-new-python-repo-using-py-template">
+<h2>Making a new Python repo using <code class="xref py py-obj docutils literal notranslate"><span class="pre">py_template</span></code><a class="headerlink" href="#making-a-new-python-repo-using-py-template" title="Link to this heading"></a></h2>
+<div class="line-block">
+<div class="line">1) Click the ‘Use this template’ button at the top-right of the GitHub page.</div>
+<div class="line">2) In your new repo, rename (search and replace) all instances of “py_template” with the name for your package.</div>
+<div class="line">3a) If you create a public repo, to set up your docs deployment CI: from your repo page, go to ‘Settings’ then ‘Pages’, then set ‘Source’ as ‘Deploy from a branch’ and set ‘Branch’ as ‘gh-pages’. Your docs will now deploy according to the trigger in <code class="xref py py-obj docutils literal notranslate"><span class="pre">github/workflows/docs.yml</span></code></div>
+<div class="line">3b) If you create a private repo, the docs build will fail because private repos can’t have a public docs page. You can disable the docs build and deploy workflow in <code class="xref py py-obj docutils literal notranslate"><span class="pre">github/workflows/docs.yml</span></code></div>
+<div class="line">4) Update the <code class="xref py py-obj docutils literal notranslate"><span class="pre">authors</span></code> field in <code class="xref py py-obj docutils literal notranslate"><span class="pre">pyproject.toml</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">docs/conf.py</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">LICENSE.rst</span></code> (the template is partially based on the <a class="reference external" href="https://github.com/OpenAstronomy/packaging-guide">OpenAstronomy packaging guide</a>, so please retain that aspect of the license).</div>
+</div>
+</section>
+<section id="interacting-with-your-new-code">
+<h2>Interacting with your new code<a class="headerlink" href="#interacting-with-your-new-code" title="Link to this heading"></a></h2>
+<div class="line-block">
+<div class="line">After cloning your repo to your computer, from the project’s root directory, you can:</div>
+<div class="line">1) Install your package with all optional dependencies:</div>
+<div class="line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">&quot;.[dev]&quot;</span></code></div>
+<div class="line">2) Run your tests:</div>
+<div class="line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">.</span></code></div>
+<div class="line">3) Run linting and formatting to see their effects:</div>
+<div class="line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ruff</span> <span class="pre">check</span> <span class="pre">.</span></code></div>
+<div class="line">4) Run type checking using mypy:</div>
+<div class="line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mypy</span> <span class="pre">--strict</span> <span class="pre">.</span></code></div>
+<div class="line">5) Build your docs locally:</div>
+<div class="line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cd</span> <span class="pre">docs;</span> <span class="pre">make</span> <span class="pre">html</span></code></div>
+<div class="line">After building the docs, view them with</div>
+<div class="line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open</span> <span class="pre">docs/_build/html/index.html</span></code></div>
+</div>
+</section>
+<section id="developing-your-package">
+<h2>Developing your package<a class="headerlink" href="#developing-your-package" title="Link to this heading"></a></h2>
+<div class="line-block">
+<div class="line">1) Add new unit tests in <code class="xref py py-obj docutils literal notranslate"><span class="pre">test/test_*.py</span></code> for new functions and classes. Test not just whether the new code runs, but also if it gives a sensible result.</div>
+<div class="line">2) Update the docs, including the main page (<code class="xref py py-obj docutils literal notranslate"><span class="pre">docs/index.rst</span></code>), adding pages, and updating the API (<code class="xref py py-obj docutils literal notranslate"><span class="pre">docs/py_API.rst</span></code>) when you add new functions and classes.</div>
+<div class="line">3) Optionally change the CI triggers for each of the actions in <code class="xref py py-obj docutils literal notranslate"><span class="pre">github/workflows</span></code>.</div>
+<div class="line">4) Update the changelog in <code class="xref py py-obj docutils literal notranslate"><span class="pre">HISTORY.rst</span></code> when you’re ready to release your first version of the code!</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="py_API.html" class="btn btn-neutral float-right" title="example_module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Jeff Jennings.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
