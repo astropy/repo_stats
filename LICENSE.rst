@@ -1,4 +1,4 @@
-`py_template` author: Jeff Jennings (jjennings@flatironinstitute.org)
+`repo_stats` author: Jeff Jennings (jjennings@flatironinstitute.org)
 
 This package is based upon
 the `OpenAstronomy packaging guide <https://github.com/OpenAstronomy/packaging-guide>`_

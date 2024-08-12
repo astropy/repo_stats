@@ -9,11 +9,11 @@ import datetime
 # -- Project information -----------------------------------------------------
 
 # The full version, including alpha/beta/rc tags
-from py_template import __version__
+from repo_stats import __version__
 
 release = __version__
 
-project = "py_template"
+project = "repo_stats"
 author = "Jeff Jennings"
 copyright = f"{datetime.datetime.now().year}, {author}"  # noqa: A001
 
