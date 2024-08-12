@@ -218,3 +218,79 @@ def open_issue_PR_plot(issue_pr_stats, repo_name, cache_dir):
 
     return fig
 
+
+def issue_PR_time_plot(issue_pr_stats, repo_owner, repo_name, cache_dir, window_avg=7):
+    """
+    Plot a repository's number of issues and pull requests open and closed over time.
+
+    Arguments
+    ---------
+    issue_pr_stats : list of dict
+        Statistics for issues and pull requests (see `git_metrics.Gits.process_issues_PRs`)
+    repo_owner : str
+        Owner of repository (for labels)
+    repo_name : str
+        Name of repository (for labels and figure savename)
+    cache_dir : str
+        Name of directory in which to cache figure
+    window_avg : int, default=7
+        Number of months for rolling average of commit data. Enforced to be odd.
+
+    Returns
+    -------
+    fig : `plt.figure` instance
+        The generated figure
+    """
+    print("\nMaking figure: issues and pull requests over time")
+
+    month_io, issue_open = issue_pr_stats["issues"]["open_per_month"]
+    month_ic, issue_close = issue_pr_stats["issues"]["close_per_month"]
+    month_po, pr_open = issue_pr_stats["pullRequests"]["open_per_month"]
+    month_pc, pr_close = issue_pr_stats["pullRequests"]["close_per_month"]
+
+    # don't include current month (if it's early in the month, result biased low)
+    months = [
+        month_po[:-1],
+        month_pc[:-1],
+        month_io[:-1],
+        month_ic[:-1],
+    ]
+    events = [
+        pr_open[:-1],
+        pr_close[:-1],
+        issue_open[:-1],
+        issue_close[:-1],
+    ]
+    labels = [
+        "PRs opened / month",
+        "PRs closed / month",
+        "Issues opened / month",
+        "Issues closed / month",
+    ]
+
+    fig = plt.figure(figsize=(10, 6))
+    for i, j in enumerate(events):
+        plt.plot(months[i], j, cs[i], alpha=0.2, label=labels[i])
+
+        roll_avg, window_avg = rolling_average(j, window_avg)
+        cut_idx = window_avg // 2
+        plt.plot(
+            months[i][cut_idx:-cut_idx],
+            roll_avg,
+            cs[i],
+            label=f"{labels[i]}: {window_avg} month rolling average",
+        )
+
+    plt.xticks(months[i][::12], rotation=90)
+
+    plt.title(
+        f"Issues and PRs opened and closed in {repo_owner}/{repo_name} (generated on {now})"
+    )
+    plt.legend(ncol=2)
+    plt.xlabel("Date")
+    plt.ylabel("N")
+    plt.tight_layout()
+    plt.savefig(f"{cache_dir}/{repo_name}_issues_PRs.png", dpi=300)
+    # plt.show(block=False)
+
+    return fig
