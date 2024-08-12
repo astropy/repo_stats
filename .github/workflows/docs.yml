@@ -40,21 +40,7 @@ jobs:
           pip install .
           cd docs
           make html
-
-      # check code coverage, store results in the built docs.
-      # coverage.py creates a .gitignore with '*' where it's run; remove it
-      # to keep the coverage report and badge on gh-pages
-      - name: Coverage
-        # only continue if the PR is not just closed, but also merged:
-        # if: github.event.pull_request.merged == true
-        run: |
-          coverage run --source=py_template -m pytest test/*.py
-          coverage report
-          mkdir -p docs/_build/html/coverage
-          coverage html -d docs/_build/html/coverage
-          rm docs/_build/html/coverage/.gitignore
-          coverage-badge -f -o docs/_build/html/coverage/badge.svg
-
+          
       # upload the built docs as an artifact so the files can be accessed
       # by a subsequent job in the workflow.
       # only store the artifact for 'retention-days'
