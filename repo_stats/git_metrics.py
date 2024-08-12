@@ -260,3 +260,128 @@ class GitMetrics:
 
         return dates, authors
 
+    def process_commits(self, results, age_recent=90):
+        """
+        Process (obtain statistics for) git commit data
+
+        Arguments
+        ---------
+        results : list of dict
+            A dictionary entry for each commit in the history (see `Git_metrics.get_commits`)
+        age_recent : int, default=90
+            Days before present used to categorize recent commit statistics
+
+        Returns
+        -------
+        stats : dict
+            Commit statistics:
+                - 'age_recent_commit': the input arg 'age_recent'
+                - 'unique_authors': each commit author, their number of commits and index of first commit
+                - 'new_authors': list of authors with their first commit in 'age_recent'
+                - 'n_recent_authors': number of authors with commits in 'age_recent'
+                - 'authors_per_month': number of commit authors per month, over time
+                - 'new_authors_per_month': number of new commit authors per month, over time
+                - 'multi_authors_per_month': number of commit authors per month with >1 commit that month, over time
+        """
+        dates, authors, userIDs = [], [], []
+        bots = [
+            "dependabot[bot]",
+            "github-actions",
+            "odidev",
+            "pre-commit-ci[bot]",
+            "unknown",
+        ]
+
+        for ii in results:
+            if ii["node"]["author"]["name"] not in bots:
+                dates.append(ii["node"]["authoredDate"])
+                authors.append(ii["node"]["author"]["name"])
+                # some authors have None in 'user' field
+                try:
+                    userIDs.append(ii["node"]["author"]["user"]["databaseId"])
+                except TypeError:
+                    userIDs.append(ii["node"]["author"]["name"])
+
+        print(f"  {len(dates)} total commits")
+
+        # assuming we don't have a .mailmap file to connect unique authors to multiple versions of their name and/or emails,
+        # use their GitHub IDs (likely won't catch all variations)
+        uniqueIDs = np.unique(userIDs, return_index=True, return_counts=True)
+        # IDs that occur in commit history at least twice
+        uniqueIDs_repeat = [
+            x for i, x in enumerate(uniqueIDs[0]) if uniqueIDs[2][i] > 1
+        ]
+        # set author name for all instances of the ID repeat to their name at last (most recent) instance
+        for i in uniqueIDs_repeat:
+            idxs = np.where(np.array(userIDs) == i)[0]
+            for j in idxs:
+                authors[j] = authors[idxs[-1]]
+
+        dates_strip_day = [d[:7] for d in dates]
+        zipped = list(zip(dates_strip_day, authors))
+
+        unique_month_author_pairs = np.unique(zipped, axis=0, return_counts=True)
+
+        # number of unique commit authors per month
+        authors_per_month = np.unique(
+            [x[0] for x in unique_month_author_pairs[0]], axis=0, return_counts=True
+        )
+        # possible that not every month has commits,
+        # so insert months without commits and 0 for their number of authors
+        authors_per_month = fill_missed_months(authors_per_month)
+
+        # number of authors per month with >1 commit that month
+        multi_authors_per_month = np.unique(
+            [
+                x[0]
+                for i, x in enumerate(unique_month_author_pairs[0])
+                if unique_month_author_pairs[1][i] > 1
+            ],
+            axis=0,
+            return_counts=True,
+        )
+        multi_authors_per_month = fill_missed_months(multi_authors_per_month)
+
+        # '*last*' and '*first*' variables assume the git log is in reverse chronological order
+        unique_authors_last_commit = np.unique(
+            authors, return_index=True, return_counts=True
+        )
+        unique_authors_first_commit = np.unique(
+            authors[::-1], return_index=True, return_counts=True
+        )
+
+        # last and first commit dates per author
+        date_last_commit = [dates[i] for i in unique_authors_last_commit[1]]
+        date_first_commit = [dates[::-1][i] for i in unique_authors_first_commit[1]]
+
+        # number of new authors per month
+        new_authors_per_month = np.unique(
+            [x[:7] for x in date_first_commit], return_counts=True
+        )
+        new_authors_per_month = fill_missed_months(new_authors_per_month)
+
+        n_recent_authors, new_authors = 0, []
+
+        for ii, jj in enumerate(unique_authors_last_commit[0]):
+            last_commit_age = self.get_age(date_last_commit[ii])
+            first_commit_age = self.get_age(date_first_commit[ii])
+
+            if last_commit_age.days <= age_recent:
+                n_recent_authors += 1
+
+                # authors with their first commit(s) in this period
+                if first_commit_age.days <= age_recent:
+                    new_authors.append(str(jj))
+
+        stats = {
+            "age_recent_commit": age_recent,
+            "unique_authors": unique_authors_first_commit,
+            "new_authors": new_authors,
+            "n_recent_authors": n_recent_authors,
+            "authors_per_month": authors_per_month,
+            "new_authors_per_month": new_authors_per_month,
+            "multi_authors_per_month": multi_authors_per_month,
+        }
+
+        return stats
+
