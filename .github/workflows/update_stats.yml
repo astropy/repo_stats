@@ -1,0 +1,37 @@
+name: Update cache files
+
+# on: push 
+on:
+  schedule:
+    - cron: "20 21 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: write    
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Display system info        
+        run: |
+          python -c "import os; os.getcwd()"
+          python -c "import sys; print(sys.version)"
+
+      - name: Install package
+        run: | 
+          pip install setuptools --upgrade
+          pip install .
+
+
+      - name: Run update script
+        run: |
+          python -m repo_stats.runner -a ${{ secrets.ADS_TOKEN }} -g ${{ secrets.GIT_TOKEN }} -c "cache" 
+
