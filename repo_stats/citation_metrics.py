@@ -83,3 +83,47 @@ class ADSCitations:
 
         return all_cites
 
+    def process_citations(self, citations):
+        """
+        Process (obtain statistics for) citation data in 'citations'
+
+        Arguments
+        ---------
+        citations : list of dict
+            Dictionary of data for each citation to the reference paper
+
+        Returns
+        -------
+        stats : dict
+            Citation statistics:
+                - 'cite_all': total number of citations
+                - 'cite_year': citations in current year
+                - 'cite_month': citations in previous month
+                - 'cite_per_year': citations per year
+                - 'cite_bibcodes': bibcodes of all citations
+        """
+        # [year, month] of each citation
+        dates = [x["pubdate"][:7].split("-") for x in citations]
+        dates = [[int(x[0]), int(x[1])] for x in dates]
+
+        time_utc = datetime.now(timezone.utc)
+        cite_total = len(citations)
+        cite_this_year = [x[0] for x in dates].count(time_utc.year)
+
+        last_month = time_utc.replace(day=1) - timedelta(days=1)
+        cite_last_month = dates.count([last_month.year, last_month.month])
+
+        cite_year, cite_per_year = np.unique([x[0] for x in dates], return_counts=True)
+
+        cite_bibcodes = [x["bibcode"] for x in citations]
+
+        stats = {
+            "cite_all": cite_total,
+            "cite_year": cite_this_year,
+            "cite_month": cite_last_month,
+            "cite_per_year": [cite_year, cite_per_year],
+            "cite_bibcodes": cite_bibcodes,
+        }
+
+        return stats
+
