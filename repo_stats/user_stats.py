@@ -23,7 +23,8 @@ class StatsImage:
         self.draw = ImageDraw.Draw(self.img)
 
         self.font = font
-        self.font_instance = ImageFont.truetype(font, 54)
+        self.font_size = 54
+        self.font_instance = ImageFont.truetype(font, self.font_size)
 
         self.color = color
         if self.color == "dark":
@@ -82,9 +83,30 @@ class StatsImage:
         )
         # case-insensitive sort
         text_authors = sorted(stats["new_authors"], key=str.lower)
-        # bound text block width to fit in box
-        text_authors = "\n".join(textwrap.wrap(", ".join(text_authors), width=47))
-        self.draw_text((70, 100), text_authors, font=ImageFont.truetype(self.font, 46))
+
+        # bound text block to fit in available space.
+        # see Image.getbbox - https://pillow.readthedocs.io/en/stable/reference/Image.html
+        max_bbox = (70, 113, 1100, 320)
+        out_of_bounds = [True]
+        fs = self.font_size * 1
+        while True in out_of_bounds:
+            text_authors_wrap = "\n".join(textwrap.wrap(", ".join(text_authors)))
+
+            text_bbox = self.draw.textbbox(
+                (70, 100),
+                text_authors_wrap,
+                font=ImageFont.truetype(self.font, fs),
+            )
+            # print(f"Font size {fs}, bounding box {text_bbox}")
+
+            out_of_bounds = [True for i, x in enumerate(text_bbox) if x > max_bbox[i]]
+            fs -= 1
+
+        self.draw_text(
+            (70, 100),
+            text_authors_wrap,
+            font=ImageFont.truetype(self.font, fs),
+        )
 
         self.draw_text(
             (1258, 51),
