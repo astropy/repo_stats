@@ -14,7 +14,7 @@ from repo_stats import __version__
 release = __version__
 
 project = "repo_stats"
-author = "Jeff Jennings"
+author = "The Astropy Developers"
 copyright = f"{datetime.datetime.now().year}, {author}"  # noqa: A001
 
 # -- General configuration ---------------------------------------------------

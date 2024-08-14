@@ -9,7 +9,7 @@ dynamic = ["version"]
 readme = { file = "README.rst", content-type = "text/x-rst" }
 license = { file = "LICENSE.rst", content-type = "text/plain" }
 authors = [
-  { name = "Jeff Jennings", email = "jjennings@flatironinstitute.org" },
+  { name = "The Astropy Developers", email = "astropy.team@gmail.com" },
 ]
 requires-python = ">=3.10"
 dependencies = ["matplotlib>=3.8.4", "numpy>=1.24", "pillow>=10.4.0", "requests>=2.32.2"]
