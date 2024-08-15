@@ -16,6 +16,7 @@ jobs:
   docs-build:
     name: Build docs
     runs-on: ubuntu-latest
+    if: (github.repository == 'astropy/repo_stats')
 
     steps:
       - name: Check out repo
@@ -55,8 +56,9 @@ jobs:
   docs-deploy:
     name: Deploy docs
     needs: docs-build
-    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    if: (github.repository == 'astropy/repo_stats')
+    # if: github.event.pull_request.merged == true
     permissions: 
       contents: write
 
