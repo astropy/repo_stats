@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-20.04
+    if: (github.repository == 'astropy/repo_stats')
 
     steps:
       - name: Check out repo
