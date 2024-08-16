@@ -1,7 +1,7 @@
 {
     "repo_owner": "GitHub owner of repository for which stats will be obtained",
     "repo_name": "GitHub name of repository for which stats will be obtained",
-    "template_image": "Image to which citation and repository statistics text will be added. Type must be str or list. If 'null', default images will be used",
+    "template_image": "Image to which citation and repository statistics text will be added. Type must be str or list. If 'null', default image will be used",
     "age_recent_commit": "Number of days before present for commit data to be classified as recent",
     "age_recent_issue_pr": "Number of days before present for issue and pull request data to be classified as recent",
     "window_avg": "Number of months over which to take a rolling average (used for plots of git stats)",
