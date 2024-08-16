@@ -77,9 +77,11 @@
            <div itemprop="articleBody">
              
   <h1>Source code for repo_stats.utilities</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">ast</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 
 
 <div class="viewcode-block" id="rolling_average">
@@ -189,6 +191,32 @@
 
     <span class="k">return</span> <span class="n">all_items</span></div>
 
+
+
+<span class="k">def</span> <span class="nf">make_transparent</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make a chosen color in an image transparent, save resulting image as .png</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+<span class="sd">    image : str</span>
+<span class="sd">        Path to image file</span>
+<span class="sd">    color : tuple, default=(0,0,0)</span>
+<span class="sd">        RGB values of color to be made transparent</span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    <span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image</span><span class="p">)</span> 
+    <span class="n">rgba</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGBA&quot;</span><span class="p">)</span> 
+    <span class="n">pixel_colors</span> <span class="o">=</span> <span class="n">rgba</span><span class="o">.</span><span class="n">getdata</span><span class="p">()</span> 
+  
+    <span class="c1"># in RGBA, transparent in (255, 255, 255, 0)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">pixel_colors_trans</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">if</span> <span class="n">x</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="n">color</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pixel_colors</span><span class="p">]</span>
+    <span class="n">rgba</span><span class="o">.</span><span class="n">putdata</span><span class="p">(</span><span class="n">pixel_colors_trans</span><span class="p">)</span> 
+
+    <span class="n">savename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">image</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_transparent.png&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saving updated image as </span><span class="si">{</span><span class="n">savename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">rgba</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">savename</span><span class="p">,</span> <span class="s2">&quot;PNG&quot;</span><span class="p">)</span> 
+    
 </pre></div>
 
            </div>
