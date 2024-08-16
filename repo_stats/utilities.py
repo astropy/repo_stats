@@ -106,6 +106,16 @@ def update_cache(cache_file, old_items, new_items):
 
 
 def make_transparent(image, color=(0,0,0)):
+    """
+    Make a chosen color in an image transparent, save resulting image as .png
+
+    Arguments
+    ---------
+    image : str
+        Path to image file
+    color : tuple, default=(0,0,0)
+        RGB values of color to be made transparent
+    """    
     im = Image.open(image) 
     rgba = im.convert("RGBA") 
     pixel_colors = rgba.getdata() 
@@ -118,3 +128,4 @@ def make_transparent(image, color=(0,0,0)):
     savename = f"{os.path.splitext(image)[0]}_transparent.png"
     print(f"Saving updated image as {savename}")
     rgba.save(savename, "PNG") 
+    
