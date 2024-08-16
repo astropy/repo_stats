@@ -3,9 +3,8 @@ from datetime import datetime, timezone
 
 from PIL import Image, ImageDraw, ImageFont
 
-
 class StatsImage:
-    def __init__(self, template_image, font, color="dark"):
+    def __init__(self, template_image, font, text_color="#4d4d4d"):
         """
         Class for updating a template image (e.g. to be displayed in a GitHub README) with repository and citation statistics.
 
@@ -15,8 +14,8 @@ class StatsImage:
             Template image to be updated
         font : str
             Font file (.tff) to be used
-        color : str
-            One of ["dark", "light"]. Background color of the image.
+        text_color : str, default='#4d4d4d'
+            Color of text to be added to the image
         """
 
         self.img = Image.open(template_image)
@@ -26,13 +25,9 @@ class StatsImage:
         self.font_size = 54
         self.font_instance = ImageFont.truetype(font, self.font_size)
 
-        self.color = color
-        if self.color == "dark":
-            self.fill = "#ffffff"
-        else:
-            self.fill = "#000000"
+        self.text_color = text_color
 
-    def draw_text(self, coords, text, fill=None, font=None, **kwargs):
+    def draw_text(self, coords, text, text_color=None, font=None, **kwargs):
         """
         Convenience wrapper for 'PIL.ImageDraw.Draw'
 
@@ -42,17 +37,17 @@ class StatsImage:
             (x,y) coordinates of text location
         text : str
             Text to be drawn
-        fill : str, default=None
+        text_color : str, default=None
             Text color
         font : 'PIL.ImageFont' instance, default=None
             Text font
         """
-        if fill is None:
-            fill = self.fill
+        if text_color is None:
+            text_color = self.text_color
         if font is None:
             font = self.font_instance
 
-        self.draw.text(coords, str(text), fill=fill, font=font, **kwargs)
+        self.draw.text(coords, str(text), fill=text_color, font=font, **kwargs)
 
     def update_image(self, stats, repo_name, cache_dir):
         """
@@ -131,6 +126,6 @@ class StatsImage:
         )
 
         # img.show()
-        self.img.save(f"{cache_dir}/{repo_name}_user_stats_{self.color}.png")
+        self.img.save(f"{cache_dir}/{repo_name}_user_stats.png")
 
         return self.img
