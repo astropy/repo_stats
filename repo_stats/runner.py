@@ -82,8 +82,9 @@ def parse_parameters(*args):
 
     if params["template_image"] is None:
         params["template_image"] = [
-            f"{repo_stats_path}/../dashboard_template/user_stats_template_dark.png",
-            f"{repo_stats_path}/../dashboard_template/user_stats_template_light.png",
+            f"{repo_stats_path}/../dashboard_template/user_stats_template_transparent.png",
+            # f"{repo_stats_path}/../dashboard_template/user_stats_template_dark.png",
+            # f"{repo_stats_path}/../dashboard_template/user_stats_template_light.png",
         ]
     params["template_image"] = list(params["template_image"])
     params["font"] = f"{repo_stats_path}/../dashboard_template/Jost[wght].ttf"
@@ -130,9 +131,8 @@ def main(*args):
     all_stats = {**cite_stats, **commit_stats, **issue_pr_stats}
 
     print("\nUpdating dashboard image with stats")
-    background_colors = ["dark", "light"]
-    for ii, jj in enumerate(params["template_image"]):
-        UserStatsImage = StatsImage(jj, params["font"], color=background_colors[ii])
+    for ii in params["template_image"]:
+        UserStatsImage = StatsImage(ii, params["font"])
         UserStatsImage.update_image(all_stats, params["repo_name"], params["cache_dir"])
 
     citation_plot(
