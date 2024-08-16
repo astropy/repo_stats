@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from PIL import Image, ImageDraw, ImageFont
 
 class StatsImage:
-    def __init__(self, template_image, font, text_color="#4d4d4d"):
+    def __init__(self, template_image, font, text_color="#b2b2b2"):
         """
         Class for updating a template image (e.g. to be displayed in a GitHub README) with repository and citation statistics.
 
@@ -14,7 +14,7 @@ class StatsImage:
             Template image to be updated
         font : str
             Font file (.tff) to be used
-        text_color : str, default='#4d4d4d'
+        text_color : str, default='#b2b2b2'
             Color of text to be added to the image
         """
 
