@@ -1,6 +1,8 @@
-import numpy as np
+import os
 import ast
 from datetime import datetime, timezone
+import numpy as np
+from PIL import Image
 
 
 def rolling_average(unaveraged, window):
@@ -101,3 +103,18 @@ def update_cache(cache_file, old_items, new_items):
         all_items = [ast.literal_eval(i.rstrip("\n")) for i in all_items]
 
     return all_items
+
+
+def make_transparent(image, color=(0,0,0)):
+    im = Image.open(image) 
+    rgba = im.convert("RGBA") 
+    pixel_colors = rgba.getdata() 
+  
+    # in RGBA, transparent in (255, 255, 255, 0)
+    t = (255, 255, 255, 0)
+    pixel_colors_trans = [t if x[:3] == color else x for x in pixel_colors]
+    rgba.putdata(pixel_colors_trans) 
+
+    savename = f"{os.path.splitext(image)[0]}_transparent.png"
+    print(f"Saving updated image as {savename}")
+    rgba.save(savename, "PNG") 
