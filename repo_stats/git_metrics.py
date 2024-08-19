@@ -287,6 +287,7 @@ class GitMetrics:
         bots = [
             "dependabot[bot]",
             "github-actions",
+            "meeseeksmachine",
             "odidev",
             "pre-commit-ci[bot]",
             "unknown",
