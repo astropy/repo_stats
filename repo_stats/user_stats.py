@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from PIL import Image, ImageDraw, ImageFont
 
 class StatsImage:
-    def __init__(self, template_image, font, text_color="#b2b2b2"):
+    def __init__(self, template_image, font, text_color="#ff5804"):
         """
         Class for updating a template image (e.g. to be displayed in a GitHub README) with repository and citation statistics.
 
