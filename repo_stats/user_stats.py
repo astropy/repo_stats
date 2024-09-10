@@ -3,8 +3,9 @@ from datetime import datetime, timezone
 
 from PIL import Image, ImageDraw, ImageFont
 
+
 class StatsImage:
-    def __init__(self, template_image, font, text_color="#ff5804"):
+    def __init__(self, template_image, font):
         """
         Class for updating a template image (e.g. to be displayed in a GitHub README) with repository and citation statistics.
 
@@ -14,9 +15,17 @@ class StatsImage:
             Template image to be updated
         font : str
             Font file (.tff) to be used
-        text_color : str, default='#b2b2b2'
-            Color of text to be added to the image
         """
+
+        if "dark" in template_image:
+            self.theme = "dark"
+            self.text_color = "#ffffff"
+        elif "light" in template_image:
+            self.theme = "light"
+            self.text_color = "#000000"
+        else:
+            self.theme = "transparent"
+            self.text_color = "#999999"
 
         self.img = Image.open(template_image)
         self.draw = ImageDraw.Draw(self.img)
@@ -24,8 +33,6 @@ class StatsImage:
         self.font = font
         self.font_size = 54
         self.font_instance = ImageFont.truetype(font, self.font_size)
-
-        self.text_color = text_color
 
     def draw_text(self, coords, text, text_color=None, font=None, **kwargs):
         """
@@ -126,6 +133,6 @@ class StatsImage:
         )
 
         # img.show()
-        self.img.save(f"{cache_dir}/{repo_name}_user_stats.png")
+        self.img.save(f"{cache_dir}/{repo_name}_user_stats_{self.theme}.png")
 
         return self.img
