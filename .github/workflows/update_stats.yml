@@ -5,6 +5,8 @@ on:
   schedule:
     # workflow may be delayed for longer when it's on the hour
     - cron: "20 07 * * *"
+  # allow manual triggering of workflow
+  workflow_dispatch:
 
 jobs:
   build:
