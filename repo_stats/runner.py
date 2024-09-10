@@ -83,8 +83,8 @@ def parse_parameters(*args):
     if params["template_image"] is None:
         params["template_image"] = [
             f"{repo_stats_path}/../dashboard_template/user_stats_template_transparent.png",
-            # f"{repo_stats_path}/../dashboard_template/user_stats_template_dark.png",
-            # f"{repo_stats_path}/../dashboard_template/user_stats_template_light.png",
+            f"{repo_stats_path}/../dashboard_template/user_stats_template_dark.png",
+            f"{repo_stats_path}/../dashboard_template/user_stats_template_light.png",
         ]
     params["template_image"] = list(params["template_image"])
     params["font"] = f"{repo_stats_path}/../dashboard_template/Jost[wght].ttf"
