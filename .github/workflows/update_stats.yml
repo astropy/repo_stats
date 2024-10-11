@@ -35,12 +35,12 @@ jobs:
           pip install .
 
       # cache key syntax: https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows#using-contexts-to-create-cache-keys
-      - name: Restore cached files
-        id: cache-files-restore
-        uses: actions/cache/restore@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2  # v4.1.0
-        with: 
-          path: ./cache
-          key: ${{ runner.os }}-${{ hashFiles('~/.cache_key') }}
+      # - name: Restore cached files
+      #   id: cache-files-restore
+      #   uses: actions/cache/restore@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2  # v4.1.0
+      #   with: 
+      #     path: ./cache
+      #     key: ${{ runner.os }}-${{ hashFiles('~/.cache_key') }}
 
       - name: Run update script
         run: |
