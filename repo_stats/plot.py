@@ -79,13 +79,13 @@ def author_time_plot(commit_stats, repo_owner, repo_name, cache_dir, window_avg=
 
     plt.axhline(0, c="k", ls="--")
 
-    plt.xticks(months[::12], rotation=90)
+    plt.xticks(ticks=months[::12], labels=[x[:4] for x in months[::12]])#, rotation=90)
 
     plt.title(
         f"Unique authors of commits to {repo_owner}/{repo_name} (generated on {now})"
     )
     plt.legend()
-    plt.xlabel("Date")
+    plt.xlabel(f"Date ({datetime.strptime(months[0], '%Y-%m').strftime('%B')} of each year)")
     plt.ylabel("N")
     plt.tight_layout()
     plt.savefig(f"{cache_dir}/{repo_name}_authors.png", dpi=300)
@@ -281,13 +281,13 @@ def issue_PR_time_plot(issue_pr_stats, repo_owner, repo_name, cache_dir, window_
             label=f"{labels[i]}: {window_avg} month rolling average",
         )
 
-    plt.xticks(months[i][::12], rotation=90)
+    plt.xticks(ticks=months[i][::12], labels=[x[:4] for x in months[i][::12]])#, rotation=90)
 
     plt.title(
         f"Issues and PRs opened and closed in {repo_owner}/{repo_name} (generated on {now})"
     )
     plt.legend(ncol=2)
-    plt.xlabel("Date")
+    plt.xlabel(f"Date ({datetime.strptime(months[i][0], '%Y-%m').strftime('%B')} of each year)")
     plt.ylabel("N")
     plt.tight_layout()
     plt.savefig(f"{cache_dir}/{repo_name}_issues_PRs.png", dpi=300)
