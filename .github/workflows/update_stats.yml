@@ -1,4 +1,4 @@
-name: Update cache files
+name: Update cache branch
 
 # on: push 
 on:
@@ -34,6 +34,8 @@ jobs:
           pip install setuptools --upgrade
           pip install .
 
+      # 10/11/2024: skipping cache save/restore as the cache isn't being properly restored, 
+      # and this only takes a few minutes to run
       # cache key syntax: https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows#using-contexts-to-create-cache-keys
       # - name: Restore cached files
       #   id: cache-files-restore
