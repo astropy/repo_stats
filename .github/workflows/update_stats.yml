@@ -35,12 +35,12 @@ jobs:
           pip install .
 
       # cache key syntax: https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows#using-contexts-to-create-cache-keys
-      - name: Restore cached files
-        id: cache-files-restore
-        uses: actions/cache/restore@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2  # v4.1.0
-        with: 
-          path: ./cache
-          key: ${{ runner.os }}-${{ hashFiles('~/.cache_key') }}
+      # - name: Restore cached files
+      #   id: cache-files-restore
+      #   uses: actions/cache/restore@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2  # v4.1.0
+      #   with: 
+      #     path: ./cache
+      #     key: ${{ runner.os }}-${{ hashFiles('~/.cache_key') }}
 
       - name: Run update script
         run: |
@@ -49,16 +49,16 @@ jobs:
       # caches are immutable, so create a new one (new key) each time any of the files being cached change.
       # the cache key will be new if any files in the cache path have been changed by 'repo_stats.runner'.
       # otherwise the cache save will 'fail' (because there's no need to update it - that's fine)
-      - name: Update cached files
-        id: cache-files-save
-        uses: actions/cache/save@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2  # v4.1.0
-        with:
-          path: ./cache
-          key: ${{ runner.os }}-${{ hashFiles('./cache') }}
+      # - name: Update cached files
+      #   id: cache-files-save
+      #   uses: actions/cache/save@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2  # v4.1.0
+      #   with:
+      #     path: ./cache
+      #     key: ${{ runner.os }}-${{ hashFiles('./cache') }}
 
-      - name: Save cache key 
-        run: |
-          echo ${{ hashFiles('./cache') }} >> ~/.cache_key
+      # - name: Save cache key 
+      #   run: |
+      #     echo ${{ hashFiles('./cache') }} >> ~/.cache_key
 
       - name: Create and push to orphan branch 'cache' 
         run: |          
