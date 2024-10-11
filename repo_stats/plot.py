@@ -8,6 +8,8 @@ from repo_stats.utilities import rolling_average
 ms = [".", "+", "^", "*", "x", "o"]
 cs = ["#ff8300", "#23d361", "#bf177a", "#20c8ed"]
 
+plt.rcParams['font.size'] = 11
+
 now = datetime.now(timezone.utc).strftime("%B %d, %Y")
 
 
