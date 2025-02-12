@@ -1,4 +1,5 @@
 import os
+import time
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 
@@ -63,21 +64,27 @@ class ADSCitations:
                 }
             )
 
-            response = requests.get(
-                f"https://api.adsabs.harvard.edu/v1/search/query?{encoded_query}",
-                headers={
-                    "Authorization": "Bearer " + self.token,
-                    "Content-type": "application/json",
-                },
-            )
-            if response.status_code == 200:
-                result = response.json()["response"]
-
-                new_cites.extend(result["docs"])
-                end, start = result["numFound"], result["start"] + len(result["docs"])
-
-            else:
-                raise Exception(f"Query failed -- return code {response.status_code}")
+            query_tries = 0 
+            while True:
+                response = requests.get(
+                    f"https://api.adsabs.harvard.edu/v1/search/query?{encoded_query}",
+                    headers={
+                        "Authorization": "Bearer " + self.token,
+                        "Content-type": "application/json",
+                    },
+                )
+                
+                if response.status_code == 200:
+                    break
+                else:
+                    if query_tries == 3:
+                        raise Exception(f"Query failed after 3 attempts -- return code {response.status_code}")
+                    time.sleep(300)
+                    query_tries += 1                    
+                
+            result = response.json()["response"]
+            new_cites.extend(result["docs"])
+            end, start = result["numFound"], result["start"] + len(result["docs"])
 
         all_cites = update_cache(cache_file, old_cites, new_cites)
 
