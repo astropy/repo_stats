@@ -46,7 +46,7 @@ jobs:
 
       - name: Run update script
         run: |
-          python -m repo_stats.runner -a ${{ secrets.ADS_TOKEN }} -g ${{ secrets.GIT_TOKEN }} -c "cache" 
+          python -m repo_stats.runner -a ${{ secrets.ADS_TOKEN }} -g ${{ secrets.GITHUB_TOKEN }} -c "cache" 
 
       # caches are immutable, so create a new one (new key) each time any of the files being cached change.
       # the cache key will be new if any files in the cache path have been changed by 'repo_stats.runner'.
